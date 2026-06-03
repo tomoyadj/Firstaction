@@ -1,7 +1,7 @@
-# netlify.toml — วางไว้ที่โฟลเดอร์หลักของเว็บ
 [build]
-  functions = "netlify/functions"
+  base = "my-ai-chat"
   publish = "."
+  functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
