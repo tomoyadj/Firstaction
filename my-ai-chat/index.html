@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TOMOYA · Find Your Water</title>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Prompt:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--primary:#0A2540;--primary-light:#1B4D78;--accent:#FF6B35;--accent-light:#FF8C61;--accent-soft:#FFEDE5;--dark:#0A1929;--gray:#5A6B7C;--gray-light:#8A9BAC;--bg:#F4F6F9;--card:#FFFFFF;--border:#E1E8F0;--red:#E53935;--green:#2E7D32;--green-light:#43A047;--yellow:#FBC02D;--water:#0EA5E9;--water-light:#38BDF8}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden}
+body{font-family:'Bai Jamjuree','Prompt',sans-serif;background:var(--bg);color:var(--dark);font-size:15px;line-height:1.55;padding-bottom:90px;min-height:100vh}
+.header{background:linear-gradient(135deg,#0A1929 0%,#0A2540 50%,#1B4D78 130%);padding:24px 18px 70px;border-radius:0 0 32px 32px;position:relative;overflow:hidden;color:#fff}
+.header::before{content:"";position:absolute;top:-80px;right:-50px;width:260px;height:260px;background:radial-gradient(circle,rgba(14,165,233,.35),transparent 65%);border-radius:50%}
+.header::after{content:"";position:absolute;bottom:-60px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,107,53,.3),transparent 70%);border-radius:50%}
+.header-content{position:relative;z-index:1}
+.brand-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand-logo{width:40px;height:40px;background:linear-gradient(135deg,var(--water),var(--accent));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Prompt',sans-serif;font-weight:800;font-size:18px;color:#fff;box-shadow:0 4px 14px rgba(14,165,233,.35)}
+.brand-name{font-family:'Prompt',sans-serif;font-weight:800;font-size:19px;letter-spacing:1.5px}
+.brand-sub{font-size:10px;opacity:.6;letter-spacing:2.5px;font-weight:500}
+.motto{margin-top:16px;font-family:'Prompt',sans-serif;font-weight:900;font-size:32px;line-height:1;font-style:italic;letter-spacing:-.5px;background:linear-gradient(90deg,#fff 0%,var(--water-light) 50%,var(--accent-light) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.motto-th{font-family:'Prompt',sans-serif;font-weight:600;font-size:14px;margin-top:4px;opacity:.85;letter-spacing:.5px}
+.motto-quote{font-size:12px;opacity:.65;margin-top:6px;font-style:italic}
+.hero-stats{margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.hero-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;backdrop-filter:blur(10px);text-align:center}
+.hero-stat-num{font-family:'Prompt',sans-serif;font-weight:800;font-size:18px;color:var(--accent-light)}
+.hero-stat-label{font-size:10px;opacity:.75;margin-top:2px;letter-spacing:.3px}
+.tabs{display:flex;gap:6px;padding:0 12px;margin-top:-45px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;position:relative;z-index:2}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;background:#fff;border:none;padding:13px 16px;border-radius:14px;font-family:inherit;font-weight:600;font-size:13px;color:var(--gray);cursor:pointer;box-shadow:0 6px 20px rgba(10,37,64,.1);transition:all .25s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab.active{background:var(--dark);color:#fff;transform:translateY(-2px)}
+.tab-icon{font-size:15px}
+.content{padding:0 14px}
+.section{display:none;animation:fadeIn .35s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:22px;margin:6px 0 14px;color:var(--dark);display:flex;align-items:center;gap:10px}
+.section-title .accent{width:5px;height:24px;background:linear-gradient(180deg,var(--water),var(--accent));border-radius:3px}
+.card{background:var(--card);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(10,37,64,.06);border:1px solid var(--border)}
+.card-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:17px;line-height:1.3}
+.card-body{color:#3D4F60;font-size:14px;line-height:1.55}
+.card-body strong{color:var(--accent);font-weight:700}
+.coach-card{background:linear-gradient(135deg,var(--dark) 0%,#102841 100%);color:#fff;border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.coach-card::before{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(14,165,233,.4),transparent 60%);border-radius:50%}
+.coach-row{display:flex;gap:14px;align-items:center;position:relative;z-index:1}
+.coach-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--water),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Prompt',sans-serif;font-weight:800;font-size:28px;flex-shrink:0;box-shadow:0 4px 16px rgba(255,107,53,.4)}
+.coach-info{flex:1}
+.coach-tag{font-size:10px;letter-spacing:2.5px;opacity:.7;margin-bottom:2px}
+.coach-name{font-family:'Prompt',sans-serif;font-weight:800;font-size:22px;font-style:italic}
+.coach-bio{font-size:12px;opacity:.8;margin-top:4px;line-height:1.5}
+.quote{background:linear-gradient(135deg,var(--water) 0%,#0284C7 100%);color:#fff;padding:20px 18px;border-radius:18px;margin:14px 0;font-family:'Prompt',sans-serif;font-weight:600;font-size:16px;line-height:1.45;text-align:center;box-shadow:0 6px 22px rgba(14,165,233,.25)}
+.pillar{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px}
+.pillar-num{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Prompt',sans-serif;font-weight:800;font-size:14px;flex-shrink:0}
+.pillar-text{flex:1}
+.pillar-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:14px;margin-bottom:2px}
+.pillar-desc{font-size:12.5px;color:var(--gray);line-height:1.5}
+.macro-bar{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.macro-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.macro-protein .macro-icon{background:#FFEBEE}
+.macro-carb .macro-icon{background:#FFF3E0}
+.macro-fat .macro-icon{background:#FFFDE7}
+.macro-water .macro-icon{background:#E0F7FA}
+.macro-veg .macro-icon{background:#E8F5E9}
+.macro-info{flex:1}
+.macro-name{font-family:'Prompt',sans-serif;font-weight:700;font-size:14px}
+.macro-amount{font-size:12px;color:var(--gray);margin-top:2px}
+.shop-card{background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px}
+.shop-head{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;padding:12px 16px;font-family:'Prompt',sans-serif;font-weight:700;font-size:14px}
+.shop-row{padding:11px 16px;border-bottom:1px solid var(--border)}
+.shop-row:last-child{border-bottom:none}
+.shop-row-title{font-weight:700;font-size:13px;color:var(--accent);margin-bottom:2px}
+.shop-row-items{font-size:13px;line-height:1.6;color:#3D4F60}
+.calc-card{background:linear-gradient(135deg,#fff 0%,#F8FBFF 100%);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(10,37,64,.06)}
+.calc-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:17px;margin-bottom:3px;color:var(--primary);display:flex;align-items:center;gap:8px}
+.calc-sub{font-size:12px;color:var(--gray);margin-bottom:14px}
+.input-group{margin-bottom:12px}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.input-label{display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--dark);letter-spacing:.3px}
+.input-field{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:inherit;font-size:15px;background:#fff;color:var(--dark);-webkit-appearance:none;appearance:none}
+.input-field:focus{outline:none;border-color:var(--water)}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-btn{flex:1;min-width:60px;padding:10px 8px;border:2px solid var(--border);background:#fff;border-radius:12px;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;color:var(--gray);text-align:center}
+.radio-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;border:none;padding:14px;border-radius:12px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(255,107,53,.3)}
+.btn-primary:active{transform:scale(.98)}
+.btn-secondary{width:100%;background:#fff;color:var(--primary);border:2px solid var(--border);padding:13px;border-radius:12px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.btn-water{background:linear-gradient(135deg,var(--water),#0284C7);box-shadow:0 4px 14px rgba(14,165,233,.3)}
+.calc-result{background:linear-gradient(135deg,var(--dark),#102841);color:#fff;border-radius:14px;padding:16px;margin-top:14px;display:none}
+.calc-result.show{display:block;animation:fadeIn .35s}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.15)}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:13px;opacity:.85}
+.result-value{font-weight:700;font-size:16px;color:var(--accent-light)}
+.result-tip{font-size:12px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15);opacity:.9;line-height:1.5}
+.tdee-results{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.tdee-box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 8px;text-align:center}
+.tdee-num{font-family:'Prompt',sans-serif;font-weight:800;font-size:17px;line-height:1;color:var(--accent-light);margin-bottom:4px}
+.tdee-name{font-size:10px;opacity:.85;font-weight:500}
+.checklist-progress{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:14px;border:1px solid var(--border)}
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.progress-count{color:var(--accent);font-weight:700;font-size:14px}
+.progress-bar{height:8px;background:#E1E8F0;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--water),var(--accent));border-radius:4px;transition:width .4s ease;width:0%}
+.checklist-group-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:13px;color:var(--water);margin:18px 0 8px 4px;letter-spacing:.5px;text-transform:uppercase}
+.check-item{background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .2s}
+.check-item:active{transform:scale(.98)}
+.check-item.checked{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-color:#A5D6A7}
+.check-box{width:22px;height:22px;border:2px solid #C5D0DC;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;margin-top:1px;transition:all .2s}
+.check-item.checked .check-box{background:var(--green-light);border-color:var(--green-light)}
+.check-box svg{opacity:0;transition:opacity .2s}
+.check-item.checked .check-box svg{opacity:1}
+.check-label{font-size:14px;line-height:1.4;color:var(--dark);font-weight:500}
+.check-item.checked .check-label{color:var(--gray);text-decoration:line-through}
+.note-card{background:#FFF8E1;border-left:4px solid var(--yellow);padding:12px 14px;border-radius:10px;margin:10px 0;font-size:13px;line-height:1.55}
+.note-card strong{color:#F57F17}
+.reset-btn{display:block;margin:20px auto;background:transparent;border:1px solid var(--border);color:var(--gray);padding:10px 20px;border-radius:24px;font-family:inherit;font-size:13px;cursor:pointer}
+.sub-nav{display:flex;background:#fff;border-radius:14px;padding:4px;margin-bottom:14px;border:1px solid var(--border);gap:4px}
+.sub-tab{flex:1;padding:10px;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:13px;color:var(--gray);border-radius:10px;cursor:pointer}
+.sub-tab.active{background:var(--dark);color:#fff}
+.sub-section{display:none}
+.sub-section.active{display:block;animation:fadeIn .3s}
+.program-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.program-btn{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:center;transition:all .25s}
+.program-btn.active{background:linear-gradient(135deg,var(--dark),#102841);border-color:var(--dark);color:#fff;transform:translateY(-2px);box-shadow:0 6px 18px rgba(10,37,64,.2)}
+.program-btn-icon{font-size:26px;margin-bottom:4px}
+.program-btn-name{font-family:'Prompt',sans-serif;font-weight:800;font-size:13px;line-height:1.2}
+.program-btn-sub{font-size:10px;margin-top:2px;opacity:.7}
+.day-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:14px}
+.day-chips::-webkit-scrollbar{display:none}
+.day-chip{flex-shrink:0;background:#fff;border:1.5px solid var(--border);padding:9px 16px;border-radius:24px;font-family:inherit;font-weight:600;font-size:12.5px;color:var(--gray);cursor:pointer;white-space:nowrap}
+.day-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.day-header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.day-header-name{font-family:'Prompt',sans-serif;font-weight:800;font-size:18px;line-height:1}
+.day-header-focus{font-size:11px;opacity:.85;margin-top:3px}
+.day-header-num{background:rgba(255,255,255,.15);border-radius:12px;padding:5px 10px;font-size:12px;font-weight:700}
+.exercise-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.exercise-row{display:flex;align-items:center;gap:12px;cursor:pointer}
+.exercise-img{width:48px;height:48px;border-radius:11px;background:linear-gradient(135deg,#F0F4F8,#E1E8F0);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.exercise-info{flex:1;min-width:0}
+.exercise-name{font-family:'Prompt',sans-serif;font-weight:700;font-size:14px;color:var(--dark);line-height:1.2;margin-bottom:2px}
+.exercise-meta{font-size:11px;color:var(--gray);display:flex;gap:8px}
+.exercise-act{display:flex;gap:6px;align-items:center}
+.icon-btn{width:34px;height:34px;border-radius:10px;background:#F0F4F8;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:14px}
+.icon-btn.primary{background:var(--accent);color:#fff}
+.icon-btn:active{transform:scale(.92)}
+.set-list{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);display:none}
+.exercise-card.expanded .set-list{display:block}
+.set-row{display:grid;grid-template-columns:24px 1fr 1fr 30px;gap:8px;margin-bottom:6px;align-items:center}
+.set-num{font-family:'Prompt',sans-serif;font-weight:700;font-size:13px;color:var(--accent);text-align:center}
+.set-input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;text-align:center;-webkit-appearance:none}
+.set-input:focus{outline:none;border-color:var(--accent)}
+.set-del{background:transparent;border:none;color:#CCD5DE;cursor:pointer;padding:4px;font-size:14px}
+.set-add{background:#F0F4F8;border:1.5px dashed var(--border);color:var(--gray);padding:8px;border-radius:8px;width:100%;font-family:inherit;font-weight:600;font-size:12px;cursor:pointer;margin-top:6px}
+.muscle-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:12px}
+.muscle-chips::-webkit-scrollbar{display:none}
+.muscle-chip{flex-shrink:0;background:#fff;border:1.5px solid var(--border);padding:8px 14px;border-radius:24px;font-family:inherit;font-weight:600;font-size:12px;color:var(--gray);cursor:pointer;white-space:nowrap}
+.muscle-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lib-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;cursor:pointer}
+.lib-card-img{width:48px;height:48px;margin:0 auto 8px;border-radius:12px;background:linear-gradient(135deg,#F0F4F8,#E1E8F0);display:flex;align-items:center;justify-content:center;font-size:24px}
+.lib-card-name{font-family:'Prompt',sans-serif;font-weight:700;font-size:13px;color:var(--dark);line-height:1.2}
+.lib-card-muscle{font-size:10px;color:var(--gray);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.tracker-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.tracker-stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center}
+.tracker-stat-label{font-size:10px;color:var(--gray);letter-spacing:1px;font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.tracker-stat-num{font-family:'Prompt',sans-serif;font-weight:800;font-size:20px;line-height:1;margin-bottom:4px}
+.tracker-stat-unit{font-size:10px;color:var(--gray)}
+.chart-card{background:#fff;border-radius:18px;padding:14px;margin-bottom:14px;border:1px solid var(--border)}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.chart-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+.chart-title-dot{width:10px;height:10px;border-radius:50%}
+.chart-svg{width:100%;height:180px;display:block}
+.chart-empty{text-align:center;padding:36px 20px;color:var(--gray);font-size:13px}
+.chart-empty-icon{font-size:32px;margin-bottom:8px;opacity:.4}
+.history-card{background:#fff;border-radius:18px;margin-bottom:14px;border:1px solid var(--border);overflow:hidden}
+.history-head{padding:14px 16px;background:#F0F4F8;font-family:'Prompt',sans-serif;font-weight:700;font-size:14px;border-bottom:1px solid var(--border)}
+.history-list{max-height:280px;overflow-y:auto}
+.history-row{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:center;font-size:13px}
+.history-row:last-child{border-bottom:none}
+.history-date{font-weight:700;color:var(--dark);min-width:55px}
+.history-val{font-weight:600}
+.history-val .lbl{font-size:10px;color:var(--gray);font-weight:500;margin-right:4px}
+.history-del{background:transparent;border:none;color:#CCD5DE;cursor:pointer;padding:4px;font-size:16px}
+.history-empty{padding:30px;text-align:center;color:var(--gray);font-size:13px}
+.photo-angle-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.photo-angle{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:8px;text-align:center;cursor:pointer;position:relative;overflow:hidden}
+.photo-preview{width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,#F0F4F8,#E1E8F0);border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:6px}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gray-light)}
+.photo-preview-empty svg{width:32px;height:32px;opacity:.5;margin-bottom:4px}
+.photo-angle-name{font-family:'Prompt',sans-serif;font-weight:700;font-size:12px;color:var(--dark)}
+.photo-angle-count{font-size:10px;color:var(--gray);margin-top:2px}
+.photo-badge{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;z-index:2}
+.capture-area{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;border:2px dashed var(--water);text-align:center}
+.capture-instr{font-size:13px;color:var(--gray);line-height:1.5;margin-bottom:12px}
+.capture-instr strong{color:var(--water)}
+.gallery{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px}
+.gallery-item{aspect-ratio:3/4;border-radius:8px;overflow:hidden;position:relative;cursor:pointer;background:#F0F4F8}
+.gallery-item img{width:100%;height:100%;object-fit:cover}
+.gallery-date{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:9px;font-weight:700;padding:8px 4px 4px;text-align:center}
+.gallery-empty{grid-column:1/-1;padding:30px;text-align:center;color:var(--gray);font-size:13px}
+.chat-area{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;height:65vh;min-height:400px}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,#F8FBFF,#fff)}
+.msg{max-width:85%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.5;word-wrap:break-word;white-space:pre-wrap}
+.msg.ai{background:#fff;border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.typing{background:#fff;border:1px solid var(--border);align-self:flex-start;padding:13px 16px}
+.typing-dots{display:inline-flex;gap:4px}
+.typing-dots span{width:6px;height:6px;background:var(--gray-light);border-radius:50%;animation:typing 1.4s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-quick{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);overflow-x:auto;scrollbar-width:none;background:#FAFCFE}
+.chat-quick::-webkit-scrollbar{display:none}
+.quick-btn{flex-shrink:0;background:#fff;border:1.5px solid var(--border);padding:8px 14px;border-radius:20px;font-family:inherit;font-size:12px;color:var(--gray);cursor:pointer;white-space:nowrap}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:#fff}
+.chat-input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:22px;font-family:inherit;font-size:14px;-webkit-appearance:none}
+.chat-input:focus{outline:none;border-color:var(--accent)}
+.chat-send{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(255,107,53,.3)}
+.chat-send:disabled{opacity:.5;cursor:not-allowed}
+.sheet-overlay{position:fixed;inset:0;background:rgba(10,25,41,.6);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(2px)}
+.sheet-overlay.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;z-index:101;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:88vh;display:flex;flex-direction:column}
+.sheet.open{transform:translateY(0)}
+.sheet-handle{width:40px;height:5px;background:#D0D8E0;border-radius:3px;margin:10px auto 6px;flex-shrink:0}
+.sheet-head{padding:0 18px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0}
+.sheet-title{font-family:'Prompt',sans-serif;font-weight:800;font-size:18px}
+.sheet-close{width:32px;height:32px;border-radius:50%;background:#F0F4F8;border:none;font-size:14px;cursor:pointer;color:var(--gray)}
+.sheet-body{padding:16px 18px;overflow-y:auto;flex:1}
+.ex-detail-img{width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:64px;color:#fff;margin-bottom:14px}
+.ex-detail-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ex-tag{background:#F0F4F8;color:var(--dark);padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.ex-tag.muscle{background:var(--accent-soft);color:var(--accent)}
+.ex-tag.equip{background:#E0F2FE;color:var(--water)}
+.ex-section{margin-bottom:14px}
+.ex-section-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--primary)}
+.ex-steps{margin-left:18px;font-size:13.5px;color:#3D4F60;line-height:1.7}
+.ex-steps li{margin-bottom:4px}
+.ex-tips{background:#FFF4ED;border-left:3px solid var(--accent);padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.6}
+.ex-tips strong{color:var(--accent)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:#fff;padding:12px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:200;transition:transform .3s;box-shadow:0 6px 24px rgba(0,0,0,.3);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.photo-viewer{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:200;display:none;flex-direction:column;justify-content:center;align-items:center}
+.photo-viewer.open{display:flex}
+.photo-viewer img{max-width:100%;max-height:80vh;object-fit:contain}
+.photo-viewer-close{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer}
+.photo-viewer-info{color:#fff;margin-top:12px;font-size:14px;font-weight:600}
+.footer-quote{margin:20px 0 14px;padding:18px;background:#fff;border-radius:18px;text-align:center;border:2px dashed var(--water)}
+.footer-quote-text{font-family:'Prompt',sans-serif;font-weight:700;font-size:15px;color:var(--water);line-height:1.45;font-style:italic}
+.empty-state{text-align:center;padding:40px 20px;color:var(--gray)}
+.empty-icon{font-size:42px;margin-bottom:10px;opacity:.4}
+.empty-text{font-size:13px;line-height:1.5}
+.ex-select{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;background:#fff;color:var(--dark);-webkit-appearance:none;appearance:none}
+/* DARK MODE */
+body[data-theme="dark"]{--primary:#3B82F6;--primary-light:#60A5FA;--dark:#0B1220;--gray:#94A3B8;--gray-light:#64748B;--bg:#0F172A;--card:#1E293B;--border:#334155}
+body[data-theme="dark"] .card,body[data-theme="dark"] .macro-bar,body[data-theme="dark"] .pillar,body[data-theme="dark"] .shop-card,body[data-theme="dark"] .calc-card,body[data-theme="dark"] .check-item,body[data-theme="dark"] .checklist-progress,body[data-theme="dark"] .tracker-stat,body[data-theme="dark"] .chart-card,body[data-theme="dark"] .history-card,body[data-theme="dark"] .exercise-card,body[data-theme="dark"] .lib-card,body[data-theme="dark"] .photo-angle,body[data-theme="dark"] .program-btn,body[data-theme="dark"] .day-chip,body[data-theme="dark"] .muscle-chip,body[data-theme="dark"] .tab,body[data-theme="dark"] .sub-nav,body[data-theme="dark"] .chat-area,body[data-theme="dark"] .sheet,body[data-theme="dark"] .capture-area{background:var(--card);color:#E2E8F0}
+body[data-theme="dark"] .card-body,body[data-theme="dark"] .pillar-desc,body[data-theme="dark"] .macro-amount,body[data-theme="dark"] .shop-row-items,body[data-theme="dark"] .check-label,body[data-theme="dark"] .exercise-meta,body[data-theme="dark"] .lib-card-muscle{color:#CBD5E1}
+body[data-theme="dark"] .card-title,body[data-theme="dark"] .section-title,body[data-theme="dark"] .pillar-title,body[data-theme="dark"] .macro-name,body[data-theme="dark"] .exercise-name,body[data-theme="dark"] .lib-card-name,body[data-theme="dark"] .photo-angle-name,body[data-theme="dark"] .sheet-title{color:#F1F5F9}
+body[data-theme="dark"] .input-field,body[data-theme="dark"] .set-input,body[data-theme="dark"] .ex-select,body[data-theme="dark"] .chat-input,body[data-theme="dark"] .radio-btn{background:#0F172A;color:#E2E8F0;border-color:#334155}
+body[data-theme="dark"] .chat-messages{background:linear-gradient(180deg,#162032,#1E293B)}
+body[data-theme="dark"] .msg.ai{background:#0F172A;color:#E2E8F0;border-color:#334155}
+body[data-theme="dark"] .history-head,body[data-theme="dark"] .icon-btn,body[data-theme="dark"] .set-add,body[data-theme="dark"] .exercise-img,body[data-theme="dark"] .lib-card-img,body[data-theme="dark"] .quick-btn{background:#0F172A;color:#CBD5E1}
+body[data-theme="dark"] .note-card{background:#2A2410}
+.support-card{background:#EFF8FF;border:1px solid #CDE7FB;border-radius:14px;padding:14px 16px;margin:14px 0;font-size:13px;line-height:1.6;color:#3D4F60}
+.support-card strong{color:var(--water)}
+.support-card a{color:var(--water);font-weight:700;text-decoration:none}
+body[data-theme="dark"] .support-card{background:#15293c;border-color:#1e3a52;color:#CBD5E1}
+body[data-theme="dark"] .photo-preview{background:#0F172A}
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:300;background:linear-gradient(135deg,#0A1929 0%,#0A2540 60%,#1B4D78 130%);display:none;flex-direction:column;justify-content:center;align-items:center;padding:24px;overflow-y:auto}
+.login-screen.show{display:flex}
+.login-box{width:100%;max-width:380px;text-align:center}
+.login-logo{width:64px;height:64px;background:linear-gradient(135deg,var(--water),var(--accent));border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:'Prompt',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0 auto 14px;box-shadow:0 6px 20px rgba(14,165,233,.4)}
+.login-motto{font-family:'Prompt',sans-serif;font-weight:900;font-size:30px;font-style:italic;line-height:1;margin-bottom:6px;background:linear-gradient(90deg,#fff,var(--water-light),var(--accent-light));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.login-sub{color:rgba(255,255,255,.7);font-size:13px;margin-bottom:28px}
+.login-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:22px;backdrop-filter:blur(10px)}
+.login-input{width:100%;padding:13px 16px;border:1.5px solid rgba(255,255,255,.2);border-radius:12px;font-family:inherit;font-size:15px;background:rgba(255,255,255,.08);color:#fff;margin-bottom:10px;-webkit-appearance:none}
+.login-input::placeholder{color:rgba(255,255,255,.4)}
+.login-input:focus{outline:none;border-color:var(--accent)}
+.login-btn{width:100%;padding:14px;border-radius:12px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;border:none;margin-bottom:10px}
+.login-btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;box-shadow:0 4px 14px rgba(255,107,53,.35)}
+.login-btn-google{background:#fff;color:#3c4043;display:flex;align-items:center;justify-content:center;gap:8px}
+.login-btn-ghost{background:transparent;color:rgba(255,255,255,.6);font-size:13px}
+.login-tab-row{display:flex;gap:8px;margin-bottom:16px}
+.login-tab{flex:1;padding:10px;border-radius:10px;border:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.login-tab.active{background:var(--accent);color:#fff}
+.login-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:rgba(255,255,255,.3);font-size:11px}
+.login-divider::before,.login-divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.15)}
+.login-error{color:#FCA5A5;font-size:12px;margin-bottom:10px;min-height:16px}
+.login-note{color:rgba(255,255,255,.45);font-size:11px;margin-top:14px;line-height:1.5}
+/* SETTINGS / ACCOUNT */
+.head-actions{position:absolute;top:22px;right:18px;z-index:3;display:flex;gap:8px}
+.head-btn{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.head-btn:active{transform:scale(.92)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-weight:600;font-size:14px}
+.settings-desc{font-size:11px;color:var(--gray);margin-top:2px}
+.toggle{width:48px;height:28px;border-radius:14px;background:#CBD5E1;position:relative;cursor:pointer;flex-shrink:0;transition:background .25s;border:none}
+.toggle.on{background:var(--green-light)}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .25s}
+.toggle.on::after{transform:translateX(20px)}
+.settings-btn{background:#F0F4F8;border:1px solid var(--border);color:var(--dark);padding:10px 16px;border-radius:10px;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.settings-btn.danger{color:var(--red)}
+/* REST TIMER */
+.rest-timer{position:fixed;bottom:0;left:0;right:0;z-index:150;background:linear-gradient(135deg,var(--dark),#102841);color:#fff;padding:16px 18px;transform:translateY(120%);transition:transform .35s cubic-bezier(.32,.72,0,1);box-shadow:0 -6px 24px rgba(0,0,0,.3)}
+.rest-timer.show{transform:translateY(0)}
+.rest-timer-row{display:flex;align-items:center;gap:14px;max-width:500px;margin:0 auto}
+.rest-circle{width:56px;height:56px;flex-shrink:0;position:relative}
+.rest-time{font-family:'Prompt',sans-serif;font-weight:800;font-size:24px;flex:1;letter-spacing:1px}
+.rest-label{font-size:11px;opacity:.7;margin-bottom:2px}
+.rest-add{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
+.rest-skip{background:var(--accent);border:none;color:#fff;padding:10px 16px;border-radius:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+/* BADGE POPUP */
+.badge-pop{position:fixed;inset:0;z-index:250;background:rgba(10,25,41,.75);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+.badge-pop.show{display:flex;animation:fadeIn .3s}
+.badge-card{background:#fff;border-radius:24px;padding:28px 22px;text-align:center;max-width:320px;width:100%;position:relative;animation:badgePop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes badgePop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+body[data-theme="dark"] .badge-card{background:var(--card)}
+.badge-icon{font-size:64px;margin-bottom:10px;animation:badgeBounce 1s ease infinite}
+@keyframes badgeBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.badge-title{font-family:'Prompt',sans-serif;font-weight:800;font-size:22px;color:var(--accent);margin-bottom:8px}
+.badge-coach{display:flex;gap:10px;align-items:center;background:linear-gradient(135deg,var(--dark),#102841);color:#fff;border-radius:14px;padding:12px;margin:14px 0;text-align:left}
+.badge-coach-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--water),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex-shrink:0}
+.badge-coach-msg{font-size:13px;line-height:1.5}
+.alt-box{background:#E0F2FE;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.6}
+body[data-theme="dark"] .alt-box{background:#15324a}
+.alt-box strong{color:var(--water)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="head-actions">
+    <button class="head-btn" id="settingsBtn">⚙️</button>
+  </div>
+  <div class="header-content">
+    <div class="brand-row">
+      <div class="brand-logo">T</div>
+      <div>
+        <div class="brand-name">TOMOYA</div>
+        <div class="brand-sub">PERSONAL TRAINER</div>
+      </div>
+    </div>
+    <div class="motto">FIND YOUR<br>WATER</div>
+    <div class="motto-th">ค้นหาน้ำของตัวเอง</div>
+    <div class="motto-quote">ไม่ต้องวิ่งแข่งกับใคร — แข่งกับตัวเองเมื่อวาน</div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num"><span id="topProgress">0</span>/16</div><div class="hero-stat-label">ACTIONS</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="topLogCount">0</div><div class="hero-stat-label">บันทึก</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="topWorkoutCount">0</div><div class="hero-stat-label">เวท</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="home"><span class="tab-icon">🏠</span>หลักการ</button>
+  <button class="tab" data-tab="eat"><span class="tab-icon">🍽️</span>กินอะไร</button>
+  <button class="tab" data-tab="energy"><span class="tab-icon">🔥</span>พลังงาน</button>
+  <button class="tab" data-tab="workout"><span class="tab-icon">💪</span>เล่นเวท</button>
+  <button class="tab" data-tab="tracker"><span class="tab-icon">📊</span>บันทึก</button>
+  <button class="tab" data-tab="ai"><span class="tab-icon">🤖</span>AI โค้ช</button>
+</div>
+
+<div class="content">
+  <div class="section active" id="home"><div class="coach-card">
+  <div class="coach-row">
+    <div class="coach-avatar">T</div>
+    <div class="coach-info">
+      <div class="coach-tag">YOUR COACH</div>
+      <div class="coach-name">โทโมยะ</div>
+      <div class="coach-bio">ทุกคนมีน้ำของตัวเอง — จังหวะ ความเร็ว วิธีที่เหมาะกับเรา หาให้เจอ แล้วเดินต่อ</div>
+    </div>
+  </div>
+</div>
+
+<div class="quote">ลีนไม่ใช่จุดหมาย<br>แต่เป็นเส้นทางที่เรียนรู้ตัวเอง</div>
+
+<div class="section-title"><span class="accent"></span>5 น้ำของพี่โทโมยะ</div>
+<div class="card-body" style="margin:0 4px 14px;color:var(--gray);font-size:13px">รากของการสร้างหุ่นแบบยั่งยืน ไม่ใช่สูตรลัด</div>
+
+<div class="pillar"><div class="pillar-num">1</div><div class="pillar-text"><div class="pillar-title">LEARN — เรียนรู้กลไก</div><div class="pillar-desc">เข้าใจว่าร่างกายเราทำงานยังไง ไขมันลดยังไง กล้ามสร้างยังไง</div></div></div>
+<div class="pillar"><div class="pillar-num">2</div><div class="pillar-text"><div class="pillar-title">PLAN — วางแผนตามชีวิตจริง</div><div class="pillar-desc">ทฤษฎีไม่เท่ากับชีวิตจริง วางแผนที่ทำตามได้ ไม่ต้องสมบูรณ์</div></div></div>
+<div class="pillar"><div class="pillar-num">3</div><div class="pillar-text"><div class="pillar-title">ACTION — ลงมือทำ</div><div class="pillar-desc">กิน นอน ออก เริ่มทำตามที่วาง วันละนิด ไม่ต้องสมบูรณ์</div></div></div>
+<div class="pillar"><div class="pillar-num">4</div><div class="pillar-text"><div class="pillar-title">CHECK — บันทึก สังเกต</div><div class="pillar-desc">จดบันทึก ดู Progress ปรับวิธีตามผลที่เห็น</div></div></div>
+<div class="pillar"><div class="pillar-num">5</div><div class="pillar-text"><div class="pillar-title">REPEAT — ทำซ้ำให้เป็นชีวิต</div><div class="pillar-desc">วินัยไม่ได้เกิดวันเดียว ทำซ้ำจนกลายเป็นใครเรา</div></div></div>
+
+<div class="section-title" style="margin-top:24px"><span class="accent"></span>5 กฎสร้างกล้าม</div>
+<div class="card-body" style="margin:0 4px 14px;color:var(--gray);font-size:13px">ที่พี่ใช้เองและสอนน้องๆ ในยิม รู้แค่นี้พอแล้ว</div>
+
+<div class="pillar" style="background:linear-gradient(135deg,#FFEDE5,#fff)"><div class="pillar-num">1</div><div class="pillar-text"><div class="pillar-title">Train to Failure</div><div class="pillar-desc">ซ้อมจนหมดแรงจริงๆ ทำซ้ำวนไปจนกล้ามเนื้อล้า — นี่คือสัญญาณว่ากล้ามถูกกระตุ้นพอที่จะโต<br><span style="display:inline-block;margin-top:6px;background:#FFF8E1;color:#B7791F;padding:6px 10px;border-radius:8px;font-size:11.5px;line-height:1.5">⚠️ <strong>มือใหม่ฟังก่อน:</strong> อย่าเพิ่งยกจนหมดแรงตั้งแต่วันแรก! สัปดาห์แรกๆ เน้น "ฟอร์มท่าให้ถูก" ก่อน เหลือแรงไว้ 2-3 ครั้งในแต่ละเซ็ต พอฟอร์มนิ่งค่อยดันถึง failure — ป้องกันบาดเจ็บ</span></div></div></div>
+<div class="pillar" style="background:linear-gradient(135deg,#E0F2FE,#fff)"><div class="pillar-num">2</div><div class="pillar-text"><div class="pillar-title">Warm-up คือหัวใจ</div><div class="pillar-desc">วอร์มก่อนเล่นเพื่อเพิ่มความยืดหยุ่นข้อต่อ ใช้ Range of Motion ได้สุด ลดการบาดเจ็บ</div></div></div>
+<div class="pillar" style="background:linear-gradient(135deg,#E8F5E9,#fff)"><div class="pillar-num">3</div><div class="pillar-text"><div class="pillar-title">ยืดเหยียดหลังเล่น</div><div class="pillar-desc">สำคัญมาก! กล้ามตึงทำให้ซ้อมครั้งถัดไปแย่ลง และเสียบุคลิก ถ้าเจ็บมากแนะนำนวดสปอร์ตหรือกายภาพ</div></div></div>
+<div class="pillar" style="background:linear-gradient(135deg,#FFF8E1,#fff)"><div class="pillar-num">4</div><div class="pillar-text"><div class="pillar-title">ความถี่ 4-5 วัน</div><div class="pillar-desc">พี่ซ้อมแต่ละมัดกล้ามทุก 4-5 วัน ไม่รอเป็นอาทิตย์ กล้ามเนื้อพัฒนาไวกว่าเห็นๆ</div></div></div>
+<div class="pillar" style="background:linear-gradient(135deg,#F3E5F5,#fff)"><div class="pillar-num">5</div><div class="pillar-text"><div class="pillar-title">Calorie Deficit</div><div class="pillar-desc">ปรับการกินให้ไขมันลดลง พุงยุบ กล้ามที่ปั้นมาก็จะเด่นชัด — ฟิตจะไม่มา ถ้ายังกินเกิน</div></div></div>
+
+<div class="section-title" style="margin-top:24px"><span class="accent"></span>เป้าหมายของคุณ</div>
+
+<div class="card">
+  <div style="display:grid;grid-template-columns:1fr;gap:10px">
+    <div style="display:flex;gap:12px;align-items:center;padding:12px;background:#FFEBEE;border-radius:12px"><div style="font-size:26px">🎯</div><div><div style="font-weight:700;font-size:14px;color:var(--red)">ลีนหุ่น</div><div style="font-size:12px;color:#666">DEFICIT 300-500 kcal + โปรตีนสูง</div></div></div>
+    <div style="display:flex;gap:12px;align-items:center;padding:12px;background:#FFF3E0;border-radius:12px"><div style="font-size:26px">💪</div><div><div style="font-weight:700;font-size:14px;color:var(--accent)">เพิ่มกล้าม</div><div style="font-size:12px;color:#666">SURPLUS 200-300 kcal + ฝึกแรงต้าน</div></div></div>
+    <div style="display:flex;gap:12px;align-items:center;padding:12px;background:#E8F5E9;border-radius:12px"><div style="font-size:26px">⚖️</div><div><div style="font-weight:700;font-size:14px;color:var(--green)">รักษาหุ่น</div><div style="font-size:12px;color:#666">กิน = ใช้ + ฝึกสม่ำเสมอ</div></div></div>
+    <div style="display:flex;gap:12px;align-items:center;padding:12px;background:#E0F2FE;border-radius:12px"><div style="font-size:26px">♻️</div><div><div style="font-weight:700;font-size:14px;color:var(--water)">RECOMP</div><div style="font-size:12px;color:#666">น้ำหนักเท่าเดิม หุ่นเปลี่ยน ลีน+กล้าม</div></div></div>
+  </div>
+</div>
+
+<div class="section-title" style="margin-top:20px"><span class="accent"></span>ACTIONS ลงมือทำ</div>
+
+<div class="checklist-progress">
+  <div class="progress-row"><span style="font-weight:600;font-size:14px">📊 ความคืบหน้า</span><span class="progress-count"><span id="checkedNum">0</span>/16</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="note-card"><strong>💡 พี่บอกน้องๆ:</strong> ไม่ต้องเริ่มทำทุกข้อพร้อมกัน เลือกข้อที่ใจอยากทำก่อน วันละข้อสองข้อ เดี๋ยวทุกอย่างจะตามมา</div>
+
+<div class="checklist-group-title">🧠 เรียนรู้ตัวเอง</div>
+<div class="check-item" data-id="a1"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">รู้ว่าตัวเองอยู่ในเป้าหมายไหน (ลีน/เพิ่ม/รักษา/รีคอมป์)</div></div>
+<div class="check-item" data-id="a2"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">รู้ TDEE และโปรตีนที่ต้องกิน (แท็บพลังงาน)</div></div>
+<div class="check-item" data-id="a3"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">ถ่ายรูปจุดเริ่มต้น 3 มุม (หน้า/ข้าง/หลัง)</div></div>
+
+<div class="checklist-group-title">🍽️ การกิน</div>
+<div class="check-item" data-id="a4"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">ดื่มแต่น้ำเปล่า งดน้ำหวาน-น้ำอัดลม<span style="display:block;font-size:11.5px;color:var(--gray);font-weight:400;margin-top:3px;text-decoration:none">💡 พกขวดน้ำติดตัว · ชา/กาแฟไม่ใส่น้ำตาลได้</span></div></div>
+<div class="check-item" data-id="a5"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">กินอิ่ม 70-80% ไม่เบิ้ลข้าว<span style="display:block;font-size:11.5px;color:var(--gray);font-weight:400;margin-top:3px">💡 กินช้าๆ วางช้อนระหว่างคำ · ตักข้าวให้น้อยลง 1-2 ช้อน</span></div></div>
+<div class="check-item" data-id="a6"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">กินโปรตีนถึงเป้า (1.6 g × IBW)<span style="display:block;font-size:11.5px;color:var(--gray);font-weight:400;margin-top:3px">💡 ง่ายสุด: ใส่ไข่/อกไก่/ปลา ทุกมื้อ · เวย์ช่วยเสริมตอนเร่งรีบ</span></div></div>
+<div class="check-item" data-id="a7"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">ผัก 3-4 หน่วย + ผลไม้ 2-3 หน่วย/วัน</div></div>
+
+<div class="checklist-group-title">😴 พักผ่อน</div>
+<div class="check-item" data-id="a8"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">นอน 7-8 ชั่วโมง นอนเป็นเวลา<span style="display:block;font-size:11.5px;color:var(--gray);font-weight:400;margin-top:3px">💡 ลดเล่นมือถือ 30 นาทีก่อนนอน · ห้องมืด-เย็น · กล้ามโตตอนหลับ</span></div></div>
+<div class="check-item" data-id="a9"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">ไม่กินก่อนนอน 3 ชั่วโมง</div></div>
+
+<div class="checklist-group-title">🏠 สภาพแวดล้อม</div>
+<div class="check-item" data-id="a10"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">ไม่ซื้อของหวาน/มันเข้าบ้าน</div></div>
+<div class="check-item" data-id="a11"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">BLOCK เวลาซื้อ/เตรียมอาหารสัปดาห์ละ 2-3 ครั้ง</div></div>
+
+<div class="checklist-group-title">💪 ออกกำลังกาย</div>
+<div class="check-item" data-id="a12"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">เลือกโปรแกรมเล่นเวท (3 หรือ 5 วัน)</div></div>
+<div class="check-item" data-id="a13"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">วอร์มอัพก่อนทุกครั้ง ยืดเหยียดหลังเล่น<span style="display:block;font-size:11.5px;color:var(--gray);font-weight:400;margin-top:3px">💡 วอร์ม 5 นาที (เดิน/ปั่น) + ยกเบาๆ 1-2 เซ็ตก่อนเล่นจริง</span></div></div>
+<div class="check-item" data-id="a14"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">เล่นถึง Train to Failure จดน้ำหนักทุกท่า<span style="display:block;font-size:11.5px;color:var(--gray);font-weight:400;margin-top:3px">💡 มือใหม่เน้นฟอร์มก่อน เหลือแรง 2-3 ครั้ง · จดเพื่อดู Progress</span></div></div>
+
+<div class="checklist-group-title">📊 ติดตามผล</div>
+<div class="check-item" data-id="a15"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">บันทึกน้ำหนัก + %ไขมัน ทุกสัปดาห์</div></div>
+<div class="check-item" data-id="a16"><div class="check-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div><div class="check-label">ถ่ายรูป Progress ทุก 2-4 สัปดาห์</div></div>
+
+<button class="reset-btn" id="resetBtn">รีเซ็ต Checklist</button>
+
+<div class="footer-quote"><div class="footer-quote-text">ไม่ต้องเทียบกับใคร<br>เทียบกับตัวเองเมื่อวาน</div></div></div>
+  <div class="section" id="eat"><div class="section-title"><span class="accent"></span>กินตามจังหวะของคุณ</div>
+
+<div class="quote" style="font-size:14px">กินอะไรไม่สำคัญเท่ากินเท่าไหร่<br>กินอย่างไรไม่สำคัญเท่ากินสม่ำเสมอ</div>
+
+<div class="card">
+  <div class="card-title">3 กฎกินเพื่อลีน</div>
+  <ul style="margin:10px 0 0 20px;font-size:14px;line-height:1.8">
+    <li><strong>DEFICIT</strong> กินน้อยกว่าใช้ 300-500 kcal/วัน</li>
+    <li><strong>โปรตีนพอ</strong> รักษากล้ามไว้</li>
+    <li><strong>อาหารหลากหลาย</strong> ได้วิตามินครบ ไม่ต้องอาหารเสริม</li>
+  </ul>
+</div>
+
+<div class="section-title" style="margin-top:18px"><span class="accent"></span>ปริมาณต่อวัน (มือเป็นตัววัด)</div>
+
+<div class="macro-bar macro-protein"><div class="macro-icon">🍗</div><div class="macro-info"><div class="macro-name">โปรตีน</div><div class="macro-amount">6-8 ฝ่ามือ เนื้อสัตว์ไม่ติดมัน</div></div></div>
+<div class="macro-bar macro-carb"><div class="macro-icon">🍚</div><div class="macro-info"><div class="macro-name">คาร์บ / แป้ง</div><div class="macro-amount">6-8 อุ้งมือ ปรับตามการเล่น</div></div></div>
+<div class="macro-bar macro-fat"><div class="macro-icon">🥑</div><div class="macro-info"><div class="macro-name">ไขมันดี</div><div class="macro-amount">6-8 นิ้วโป้ง</div></div></div>
+<div class="macro-bar macro-veg"><div class="macro-icon">🥬</div><div class="macro-info"><div class="macro-name">ผัก + ผลไม้</div><div class="macro-amount">ผัก 3-4 / ผลไม้ 2-3 หน่วย</div></div></div>
+<div class="macro-bar macro-water"><div class="macro-icon">💧</div><div class="macro-info"><div class="macro-name">น้ำเปล่า</div><div class="macro-amount">2-3 ลิตร/วัน นี่คือ "น้ำ" จริงๆ</div></div></div>
+
+<div class="note-card"><strong>💡 พี่บอกน้องๆ:</strong> 1 ฝ่ามือเนื้อสัตว์ ≈ โปรตีน 20g · กะด้วยมือก่อน ไม่ต้องชั่งทุกมื้อให้เครียด</div>
+
+<div class="section-title" style="margin-top:20px"><span class="accent"></span>ตารางโปรตีน (ผู้ชาย)</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F0F4F8;border-radius:8px;font-size:13px;font-weight:700;color:var(--gray)"><span>สูง</span><span>IBW</span><span>โปรตีน</span></div>
+  <div style="display:flex;justify-content:space-between;padding:8px 10px;font-size:13px;border-bottom:1px solid var(--border)"><span>165 cm</span><span>65 kg</span><strong style="color:var(--accent)">104 g</strong></div>
+  <div style="display:flex;justify-content:space-between;padding:8px 10px;font-size:13px;border-bottom:1px solid var(--border)"><span>170 cm</span><span>70 kg</span><strong style="color:var(--accent)">112 g</strong></div>
+  <div style="display:flex;justify-content:space-between;padding:8px 10px;font-size:13px;border-bottom:1px solid var(--border);background:#FFF4ED;border-radius:8px"><span>175 cm</span><span>75 kg</span><strong style="color:var(--accent)">120 g</strong></div>
+  <div style="display:flex;justify-content:space-between;padding:8px 10px;font-size:13px;border-bottom:1px solid var(--border)"><span>180 cm</span><span>80 kg</span><strong style="color:var(--accent)">128 g</strong></div>
+  <div style="display:flex;justify-content:space-between;padding:8px 10px;font-size:13px"><span>185 cm</span><span>85 kg</span><strong style="color:var(--accent)">136 g</strong></div>
+  <div style="font-size:11px;color:var(--gray);margin-top:8px;text-align:center">*คนออกกำลัง+ลดไขมัน · ใช้แท็บพลังงานเพื่อแม่นยำ</div>
+</div>
+
+<div class="section-title" style="margin-top:20px"><span class="accent"></span>🛒 สิ่งที่ต้องซื้อ</div>
+
+<div class="shop-card"><div class="shop-head">🍗 แหล่งโปรตีน</div><div class="shop-row"><div class="shop-row-items"><strong>เนื้อ:</strong> อกไก่ ปลา หมูเนื้อแดง<br><strong>ไข่:</strong> ไข่ทั้งฟอง / ไข่ขาว<br><strong>นม:</strong> นม Low Fat โยเกิร์ตกรีก<br><strong>พืช:</strong> เต้าหู้ ถั่วลิสง ควินัว<br><strong>เสริม:</strong> Whey Protein, Casein</div></div></div>
+
+<div class="shop-card"><div class="shop-head">🍚 คาร์บ</div><div class="shop-row"><div class="shop-row-title">ย่อยช้า 🏆 ระหว่างวัน</div><div class="shop-row-items">ควินัว ข้าวโอ๊ต ถั่วต่างๆ ฟักทอง มันหวาน</div></div><div class="shop-row"><div class="shop-row-title">ย่อยปานกลาง ก่อนเล่น</div><div class="shop-row-items">กล้วยเหลือง ข้าวกล้อง มันฝรั่ง แอปเปิล เบอร์รี</div></div><div class="shop-row"><div class="shop-row-title">ย่อยเร็ว หลังเล่น</div><div class="shop-row-items">กล้วยสุก ข้าวขาว ผลไม้หวาน ขนมปัง</div></div></div>
+
+<div class="shop-card"><div class="shop-head">🥑 ไขมันดี</div><div class="shop-row"><div class="shop-row-title">OMEGA-3 🏆</div><div class="shop-row-items">ปลาทะเล น้ำมันปลา เมล็ดแฟล็กซ์ เมล็ดเจีย วอลนัท</div></div><div class="shop-row"><div class="shop-row-title">ไขมันดีอื่น</div><div class="shop-row-items">น้ำมันมะกอก อะโวคาโด อัลมอนด์ เมล็ดทานตะวัน</div></div></div>
+
+<div class="shop-card"><div class="shop-head">🥬 ผัก ผลไม้</div><div class="shop-row"><div class="shop-row-items">ซื้อหลายสีๆ แต่ละสีให้วิตามินต่างกัน<br>🟢 ผักใบเขียว · 🥕 แครอท · 🍅 มะเขือเทศ · 🫐 เบอร์รี · 🍊 ส้ม</div></div></div>
+
+<div class="note-card"><strong>หลักการซื้อ:</strong> ซื้ออย่างละนิด ลองดูก่อน ไม่ต้องซื้อทุกอย่าง · BLOCK เวลาสัปดาห์ละ 2-3 ครั้ง</div>
+
+<div class="footer-quote"><div class="footer-quote-text">กินเพื่อแข็งแรง<br>ไม่ใช่กินเพราะอารมณ์</div></div></div>
+  <div class="section" id="energy"><div class="section-title"><span class="accent"></span>คำนวณ TDEE</div>
+
+<div class="quote" style="font-size:14px">ตัวเลขเป็นแค่ guideline<br>ฟังร่างกายเป็นหลัก</div>
+
+<div class="calc-card">
+  <div class="calc-title">🔥 พลังงานต่อวัน</div>
+  <div class="calc-sub">รู้ว่าใช้เท่าไหร่ ค่อยรู้ว่าควรกินเท่าไหร่</div>
+  <div class="input-row">
+    <div class="input-group"><label class="input-label">อายุ</label><input type="number" class="input-field" id="tdeeAge" placeholder="30" inputmode="numeric"></div>
+    <div class="input-group"><label class="input-label">น้ำหนัก (kg)</label><input type="number" class="input-field" id="tdeeWeight" placeholder="75" inputmode="decimal" step="0.1"></div>
+  </div>
+  <div class="input-group"><label class="input-label">ส่วนสูง (cm)</label><input type="number" class="input-field" id="tdeeHeight" placeholder="175" inputmode="numeric"></div>
+  <div class="input-group">
+    <label class="input-label">ระดับกิจกรรม</label>
+    <div class="radio-group" style="flex-direction:column">
+      <button class="radio-btn" data-tdee-act="1.2" style="text-align:left;padding:11px 14px">🛋️ นั่งโต๊ะ ไม่ออกกำลัง</button>
+      <button class="radio-btn active" data-tdee-act="1.375" style="text-align:left;padding:11px 14px">🚶 ออก 1-3 วัน/สัปดาห์</button>
+      <button class="radio-btn" data-tdee-act="1.55" style="text-align:left;padding:11px 14px">🏃 ออก 3-5 วัน/สัปดาห์</button>
+      <button class="radio-btn" data-tdee-act="1.725" style="text-align:left;padding:11px 14px">💪 ออก 6-7 วัน/สัปดาห์</button>
+      <button class="radio-btn" data-tdee-act="1.9" style="text-align:left;padding:11px 14px">🥇 นักกีฬา / งานหนัก</button>
+    </div>
+  </div>
+  <button class="btn-primary" id="tdeeCalcBtn">คำนวณ</button>
+  <div class="calc-result" id="tdeeResult">
+    <div class="result-row"><span class="result-label">BMR</span><span class="result-value" id="resBMR">- kcal</span></div>
+    <div class="result-row"><span class="result-label">TDEE</span><span class="result-value" id="resTDEE">- kcal</span></div>
+    <div style="font-size:10px;opacity:.85;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);font-weight:700;letter-spacing:1.5px">เป้าหมายกินต่อวัน:</div>
+    <div class="tdee-results">
+      <div class="tdee-box"><div class="tdee-num" id="resLose">-</div><div class="tdee-name">🎯 ลีน</div></div>
+      <div class="tdee-box"><div class="tdee-num" id="resMaintain">-</div><div class="tdee-name">⚖️ รักษา</div></div>
+      <div class="tdee-box"><div class="tdee-num" id="resGain">-</div><div class="tdee-name">💪 เพิ่มกล้าม</div></div>
+    </div>
+    <div class="result-tip">⚠️ ตัวเลขแม่นแค่ 70% ใช้เป็นจุดเริ่ม ปรับจาก Progress จริง 2-4 สัปดาห์</div>
+  </div>
+</div>
+
+<div class="section-title" style="margin-top:20px"><span class="accent"></span>คำนวณโปรตีน</div>
+
+<div class="calc-card">
+  <div class="calc-title">🥩 ปริมาณโปรตีน/วัน</div>
+  <div class="calc-sub">หา IBW และโปรตีนที่ควรกิน</div>
+  <div class="input-group"><label class="input-label">ส่วนสูง (cm)</label><input type="number" class="input-field" id="height" placeholder="175" inputmode="numeric"></div>
+  <div class="input-group">
+    <label class="input-label">เป้าหมาย</label>
+    <div class="radio-group">
+      <button class="radio-btn active" data-goal="1.6">ลีน</button>
+      <button class="radio-btn" data-goal="1.2">รักษา</button>
+      <button class="radio-btn" data-goal="2.4">เพิ่มกล้าม</button>
+    </div>
+  </div>
+  <button class="btn-primary" id="calcBtn">คำนวณ</button>
+  <div class="calc-result" id="calcResult">
+    <div class="result-row"><span class="result-label">IBW</span><span class="result-value" id="resIBW">- kg</span></div>
+    <div class="result-row"><span class="result-label">โปรตีน/วัน</span><span class="result-value" id="resProtein">- g</span></div>
+    <div class="result-row"><span class="result-label">เทียบฝ่ามือ</span><span class="result-value" id="resHands">- ฝ่ามือ</span></div>
+    <div class="result-tip" id="resTip"></div>
+  </div>
+</div>
+
+<div class="note-card"><strong>📌 สูตร:</strong> TDEE = Mifflin-St Jeor · IBW = ส่วนสูง − 100<br>ตัวเลขแม่นที่สุดยังต้องลองและปรับ</div>
+
+<div class="footer-quote"><div class="footer-quote-text">ตัวเลขช่วยเริ่ม<br>แต่ความสม่ำเสมอช่วยจบ</div></div></div>
+  <div class="section" id="workout"><div class="sub-nav">
+  <button class="sub-tab active" data-sub="workout" data-sub-target="w-prog">โปรแกรม</button>
+  <button class="sub-tab" data-sub="workout" data-sub-target="w-lib">คลังท่า</button>
+  <button class="sub-tab" data-sub="workout" data-sub-target="w-hist">ประวัติ</button>
+</div>
+
+<div class="sub-section active" id="w-prog">
+  <div class="section-title"><span class="accent"></span>เลือกโปรแกรม</div>
+  <div class="program-pick">
+    <button class="program-btn active" data-program="ppl">
+      <div class="program-btn-icon">🔥</div>
+      <div class="program-btn-name">3 วัน PPL</div>
+      <div class="program-btn-sub">Push · Pull · Leg</div>
+    </button>
+    <button class="program-btn" data-program="5day">
+      <div class="program-btn-icon">💪</div>
+      <div class="program-btn-name">5 วันแยก</div>
+      <div class="program-btn-sub">อก/หลัง/ไหล่/แขน/ขา</div>
+    </button>
+  </div>
+  <div class="day-chips" id="dayChips"></div>
+  <div class="day-header">
+    <div>
+      <div class="day-header-name" id="dayHeaderName">-</div>
+      <div class="day-header-focus" id="dayHeaderFocus">-</div>
+    </div>
+    <div class="day-header-num"><span id="dayExCount">0</span> ท่า</div>
+  </div>
+  <div id="exerciseList"></div>
+  <div style="margin:14px 0">
+    <button class="btn-secondary" id="addExerciseBtn" style="margin-bottom:8px">+ เพิ่มท่าจากคลัง</button>
+    <button class="btn-primary" id="saveWorkoutBtn">💾 บันทึกการเล่นวันนี้</button>
+  </div>
+  <div class="note-card"><strong>🎯 พี่บอกน้อง:</strong> วอร์มอัพก่อน · เล่นถึง Train to Failure · จดน้ำหนักทุก SET เพื่อดู Progress ในแท็บบันทึก</div>
+</div>
+
+<div class="sub-section" id="w-lib">
+  <div class="section-title"><span class="accent"></span>คลังท่าทั้งหมด</div>
+  <div class="muscle-chips" id="muscleChips">
+    <button class="muscle-chip active" data-muscle="all">ทั้งหมด</button>
+    <button class="muscle-chip" data-muscle="chest">อก</button>
+    <button class="muscle-chip" data-muscle="back">หลัง</button>
+    <button class="muscle-chip" data-muscle="shoulders">ไหล่</button>
+    <button class="muscle-chip" data-muscle="legs">ขา</button>
+    <button class="muscle-chip" data-muscle="biceps">ไบเซป</button>
+    <button class="muscle-chip" data-muscle="triceps">ไทรเซป</button>
+    <button class="muscle-chip" data-muscle="abs">ท้อง</button>
+  </div>
+  <div class="lib-grid" id="libGrid"></div>
+</div>
+
+<div class="sub-section" id="w-hist">
+  <div class="section-title"><span class="accent"></span>ประวัติการเล่น</div>
+  <div id="workoutHistList">
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-text">ยังไม่มีบันทึกการเล่น<br>เริ่มเล่นในแท็บโปรแกรม</div>
+    </div>
+  </div>
+</div></div>
+  <div class="section" id="tracker"><div class="sub-nav">
+  <button class="sub-tab active" data-sub="tracker" data-sub-target="t-body">📏 ตัวเลข</button>
+  <button class="sub-tab" data-sub="tracker" data-sub-target="t-photo">📸 รูปร่าง</button>
+  <button class="sub-tab" data-sub="tracker" data-sub-target="t-lift">💪 เวท</button>
+</div>
+
+<div class="sub-section active" id="t-body">
+  <div class="section-title"><span class="accent"></span>บันทึกน้ำหนัก</div>
+  <div class="calc-card">
+    <div class="calc-title">📝 บันทึกวันนี้</div>
+    <div class="calc-sub">อาทิตย์ละครั้งก็พอ แนวโน้มสำคัญกว่ารายวัน</div>
+    <div class="input-group"><label class="input-label">วันที่</label><input type="date" class="input-field" id="logDate"></div>
+    <div class="input-row">
+      <div class="input-group"><label class="input-label">น้ำหนัก (kg)</label><input type="number" class="input-field" id="logWeight" placeholder="75.5" inputmode="decimal" step="0.1"></div>
+      <div class="input-group"><label class="input-label">% ไขมัน</label><input type="number" class="input-field" id="logFat" placeholder="18.0" inputmode="decimal" step="0.1"></div>
+    </div>
+    <button class="btn-primary" id="logSaveBtn">บันทึก</button>
+  </div>
+
+  <div class="tracker-stats">
+    <div class="tracker-stat">
+      <div class="tracker-stat-label">เริ่ม</div>
+      <div class="tracker-stat-num" id="statStartW">-</div>
+      <div class="tracker-stat-unit">kg</div>
+      <div class="tracker-stat-num" id="statStartF" style="font-size:14px;color:var(--water);margin-top:6px">-</div>
+      <div class="tracker-stat-unit">% ไขมัน</div>
+    </div>
+    <div class="tracker-stat" style="background:linear-gradient(135deg,#FFF8F4,#fff);border-color:#FFD4B8">
+      <div class="tracker-stat-label">ตอนนี้</div>
+      <div class="tracker-stat-num" id="statCurrW" style="color:var(--accent)">-</div>
+      <div class="tracker-stat-unit">kg</div>
+      <div class="tracker-stat-num" id="statCurrF" style="font-size:14px;color:var(--water);margin-top:6px">-</div>
+      <div class="tracker-stat-unit">% ไขมัน</div>
+    </div>
+    <div class="tracker-stat">
+      <div class="tracker-stat-label">เปลี่ยน</div>
+      <div class="tracker-stat-num" id="statDiffW">-</div>
+      <div class="tracker-stat-unit">kg</div>
+      <div class="tracker-stat-num" id="statDiffF" style="font-size:14px;margin-top:6px">-</div>
+      <div class="tracker-stat-unit">% ไขมัน</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header"><div class="chart-title"><span class="chart-title-dot" style="background:var(--accent)"></span>น้ำหนัก (kg)</div></div>
+    <div id="weightChart"><div class="chart-empty"><div class="chart-empty-icon">📊</div>ยังไม่มีข้อมูล</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header"><div class="chart-title"><span class="chart-title-dot" style="background:var(--water)"></span>% ไขมัน</div></div>
+    <div id="fatChart"><div class="chart-empty"><div class="chart-empty-icon">📈</div>ยังไม่มีข้อมูล</div></div>
+  </div>
+
+  <div class="history-card">
+    <div class="history-head">📋 ประวัติ</div>
+    <div class="history-list" id="historyList"><div class="history-empty">ยังไม่มีบันทึก</div></div>
+  </div>
+
+  <button class="reset-btn" id="resetTrackerBtn">ลบบันทึกทั้งหมด</button>
+</div>
+
+<div class="sub-section" id="t-photo">
+  <div class="section-title"><span class="accent"></span>รูปร่าง 3 มุม</div>
+  <div class="quote" style="font-size:14px">กระจกบอกชัดกว่าตาชั่ง<br>ถ่ายเก็บไว้ทุกเดือน</div>
+
+  <div class="photo-angle-grid">
+    <div class="photo-angle" data-angle="front">
+      <div class="photo-preview" id="prevFront">
+        <div class="photo-preview-empty">
+          <svg viewBox="0 0 24 50" fill="currentColor"><circle cx="12" cy="5" r="3.5"/><path d="M7 12 Q12 11 17 12 L17 24 Q12 25 7 24 Z"/><rect x="9" y="24" width="6" height="14"/><ellipse cx="5.5" cy="17" rx="2" ry="6"/><ellipse cx="18.5" cy="17" rx="2" ry="6"/><rect x="9" y="38" width="2.5" height="11" rx="1"/><rect x="12.5" y="38" width="2.5" height="11" rx="1"/></svg>
+        </div>
+      </div>
+      <div class="photo-angle-name">ด้านหน้า</div>
+      <div class="photo-angle-count"><span id="cntFront">0</span> รูป</div>
+    </div>
+    <div class="photo-angle" data-angle="side">
+      <div class="photo-preview" id="prevSide">
+        <div class="photo-preview-empty">
+          <svg viewBox="0 0 18 50" fill="currentColor"><circle cx="9" cy="5" r="3.5"/><path d="M8 12 Q11 11 12 14 L12 25 Q9 26 6 25 L6 14 Q7 11 8 12 Z"/><rect x="7" y="25" width="5" height="13"/><ellipse cx="13" cy="17" rx="2" ry="6"/><rect x="7" y="38" width="2.5" height="11" rx="1"/><rect x="10" y="38" width="2.5" height="11" rx="1"/></svg>
+        </div>
+      </div>
+      <div class="photo-angle-name">ด้านข้าง</div>
+      <div class="photo-angle-count"><span id="cntSide">0</span> รูป</div>
+    </div>
+    <div class="photo-angle" data-angle="back">
+      <div class="photo-preview" id="prevBack">
+        <div class="photo-preview-empty">
+          <svg viewBox="0 0 24 50" fill="currentColor"><circle cx="12" cy="5" r="3.5"/><path d="M7 12 Q12 11 17 12 L17 24 Q12 25 7 24 Z"/><rect x="9" y="24" width="6" height="14"/><ellipse cx="5.5" cy="17" rx="2" ry="6"/><ellipse cx="18.5" cy="17" rx="2" ry="6"/><rect x="9" y="38" width="2.5" height="11" rx="1"/><rect x="12.5" y="38" width="2.5" height="11" rx="1"/></svg>
+        </div>
+      </div>
+      <div class="photo-angle-name">ด้านหลัง</div>
+      <div class="photo-angle-count"><span id="cntBack">0</span> รูป</div>
+    </div>
+  </div>
+
+  <div class="capture-area">
+    <div style="font-family:'Prompt',sans-serif;font-weight:800;font-size:16px;color:var(--water);margin-bottom:8px">📸 วิธีถ่ายให้ดี</div>
+    <div class="capture-instr">
+      ใส่กางเกงในตัวเดียว · แสงสม่ำเสมอ · ฉากเดียวกัน<br>
+      <strong>ยืนตัวตรง ผ่อนคลาย ไม่เกร็ง ไม่เก็บพุง</strong><br>
+      เก็บภาพในสภาพ "จริง" จะเห็นความเปลี่ยนแปลงชัด
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin-top:8px">แตะรูปร่าง 3 มุมด้านบนเพื่อเพิ่ม/ดูรูป</div>
+  </div>
+
+  <div class="note-card"><strong>📅 พี่แนะนำ:</strong> ถ่ายทุก 2-4 สัปดาห์ · เวลาเดียวกัน (เช้าหลังตื่น) · พอครบ 5+ รูปมุมเดียวกัน กดสร้าง GIF ดู Progress ได้!</div>
+
+  <div class="support-card"><strong>💙 จากพี่โทโมยะ</strong><br>สุขภาพใจสำคัญพอๆ กับสุขภาพกายนะน้อง ถ้าวันไหนรู้สึกว่าเรื่องอาหารหรือการออกกำลังกายเริ่มกดดันตัวเองมากเกินไป พักก่อนได้ ไม่ต้องรีบ ค่อยๆ หาจังหวะของตัวเอง และถ้าอยากคุยกับผู้เชี่ยวชาญ โทรสายด่วนสุขภาพจิต กรมสุขภาพจิต <a href="tel:1323">1323</a> ได้ตลอด 24 ชม. (ฟรี)</div>
+</div>
+
+<div class="sub-section" id="t-lift">
+  <div class="section-title"><span class="accent"></span>Progress การเล่นเวท</div>
+  <div class="quote" style="font-size:14px">กล้ามไม่โกหก<br>น้ำหนักที่ยกได้บอกได้ทุกอย่าง</div>
+
+  <div class="card">
+    <div class="card-title">ดูพัฒนาการต่อท่า</div>
+    <div class="card-body" style="margin-top:6px">เลือกท่าที่อยากดู Progress</div>
+    <select class="ex-select" id="liftSelect" style="margin-top:10px">
+      <option value="">-- เลือกท่า --</option>
+    </select>
+  </div>
+
+  <div class="tracker-stats" id="liftStats" style="display:none">
+    <div class="tracker-stat"><div class="tracker-stat-label">น้ำหนักเริ่ม</div><div class="tracker-stat-num" id="liftStart">-</div><div class="tracker-stat-unit">kg</div></div>
+    <div class="tracker-stat" style="background:linear-gradient(135deg,#FFF8F4,#fff);border-color:#FFD4B8"><div class="tracker-stat-label">ตอนนี้</div><div class="tracker-stat-num" id="liftCurr" style="color:var(--accent)">-</div><div class="tracker-stat-unit">kg</div></div>
+    <div class="tracker-stat"><div class="tracker-stat-label">เพิ่มขึ้น</div><div class="tracker-stat-num" id="liftDiff">-</div><div class="tracker-stat-unit">kg</div></div>
+  </div>
+
+  <div class="chart-card" id="liftChartCard" style="display:none">
+    <div class="chart-header"><div class="chart-title"><span class="chart-title-dot" style="background:var(--green)"></span>น้ำหนักสูงสุด/ครั้ง</div></div>
+    <div id="liftChart"></div>
+  </div>
+
+  <div id="liftEmpty" class="empty-state">
+    <div class="empty-icon">💪</div>
+    <div class="empty-text">เลือกท่าด้านบนเพื่อดู Progress<br>ยิ่งบันทึกเยอะ ยิ่งเห็นชัด</div>
+  </div>
+</div></div>
+  <div class="section" id="ai"><div class="section-title"><span class="accent"></span>AI โค้ชของพี่โทโมยะ</div>
+
+<div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,#fff,#F8FBFF)">
+  <div class="card-body">
+    <strong>พี่ฝึก AI ไว้</strong> ให้ตอบคำถามแทนพี่ ลองถามได้ทุกเรื่องเกี่ยวกับเวท โภชนาการ ลีน หรือมั่นใจตัวเอง 24/7
+  </div>
+</div>
+
+<div class="chat-area">
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-quick">
+    <button class="quick-btn" data-q="ท่า Bench Press ทำยังไงให้ถูก">เบนช์เพรสยังไง</button>
+    <button class="quick-btn" data-q="วอร์มอัพก่อนเล่นเวทควรทำท่าอะไรบ้าง">วอร์มอัพยังไง</button>
+    <button class="quick-btn" data-q="ลีนเร็วๆ ใน 1 เดือนทำได้ไหม">ลีนเร็วๆ ทำได้ไหม</button>
+    <button class="quick-btn" data-q="กินโปรตีนมากเกินไปอันตรายไหม">โปรตีนมากไป?</button>
+    <button class="quick-btn" data-q="DOMS หรือกล้ามเนื้อปวดหลังเล่นเวท ทำยังไงดี">DOMS ทำยังไง</button>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" class="chat-input" id="chatInput" placeholder="ถาม AI โค้ช..." maxlength="500">
+    <button class="chat-send" id="chatSendBtn">▶</button>
+  </div>
+</div>
+
+<div class="note-card" style="margin-top:12px"><strong>💡 หมายเหตุ:</strong> AI ช่วยแนะนำได้ แต่ถ้ามีโรค/บาดเจ็บต้องปรึกษาแพทย์เสมอ</div></div>
+</div>
+
+<div class="sheet-overlay" id="sheetOverlay"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="sheetTitle">รายละเอียด</div>
+    <button class="sheet-close" id="sheetClose">✕</button>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<div class="photo-viewer" id="photoViewer">
+  <button class="photo-viewer-close" id="photoViewerClose">✕</button>
+  <img id="photoViewerImg" src="" alt="">
+  <div class="photo-viewer-info" id="photoViewerInfo"></div>
+</div>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">T</div>
+    <div class="login-motto">FIND YOUR WATER</div>
+    <div class="login-sub">โดยโทโมยะ · เข้าสู่ระบบเพื่อเก็บข้อมูลออนไลน์</div>
+    <div class="login-card">
+      <div class="login-tab-row">
+        <button class="login-tab active" id="tabLogin">เข้าสู่ระบบ</button>
+        <button class="login-tab" id="tabSignup">สมัครสมาชิก</button>
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <input type="email" class="login-input" id="loginEmail" placeholder="อีเมล" autocomplete="email">
+      <input type="password" class="login-input" id="loginPassword" placeholder="รหัสผ่าน (6 ตัวขึ้นไป)" autocomplete="current-password">
+      <button class="login-btn login-btn-primary" id="loginSubmit">เข้าสู่ระบบ</button>
+      <div class="login-divider">หรือ</div>
+      <button class="login-btn login-btn-google" id="loginGoogle">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.3-2.1 14-5.4l-6.5-5.5C29.6 34.6 26.9 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.5 5.5C41.4 36.3 44 30.6 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+        เข้าด้วย Google
+      </button>
+      <button class="login-btn login-btn-ghost" id="loginSkip">ใช้แบบไม่ล็อกอิน (เก็บในเครื่องนี้)</button>
+    </div>
+    <div class="login-note" id="loginNote">ข้อมูลน้ำหนัก รูปภาพ และประวัติการเล่นจะถูกเก็บไว้ปลอดภัยในบัญชีของคุณ เข้าจากเครื่องไหนก็เห็นข้อมูลเดิม</div>
+  </div>
+</div>
+
+<div class="rest-timer" id="restTimer">
+  <div class="rest-timer-row">
+    <svg class="rest-circle" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="5"/><circle id="restRing" cx="28" cy="28" r="24" fill="none" stroke="#FF6B35" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="0" transform="rotate(-90 28 28)"/></svg>
+    <div style="flex:1">
+      <div class="rest-label">⏱️ พักก่อนเซ็ตถัดไป</div>
+      <div class="rest-time" id="restTime">1:00</div>
+    </div>
+    <button class="rest-add" id="restAdd">+15</button>
+    <button class="rest-skip" id="restSkip">ข้าม</button>
+  </div>
+</div>
+
+<div class="badge-pop" id="badgePop">
+  <div class="badge-card">
+    <div class="badge-icon" id="badgeIcon">🏆</div>
+    <div class="badge-title" id="badgeTitle">สำเร็จ!</div>
+    <div style="font-size:14px;color:var(--gray)" id="badgeDesc"></div>
+    <div class="badge-coach">
+      <div class="badge-coach-av">T</div>
+      <div class="badge-coach-msg" id="badgeMsg"></div>
+    </div>
+    <button class="btn-primary" id="badgeClose">เยี่ยมมาก! 💪</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none">
+
+<script>
+// ========== CONFIG ==========
+// 🔧 ใส่ค่า Supabase ตรงนี้เพื่อเปิดระบบล็อกอิน + เก็บข้อมูลออนไลน์
+// ถ้าปล่อยว่างไว้ แอปจะทำงานแบบเก็บในเครื่อง (localStorage) ตามปกติ
+const SUPABASE_URL='';      // เช่น 'https://xxxx.supabase.co'
+const SUPABASE_ANON_KEY=''; // anon public key
+
+let supa=null;
+const SUPA_ENABLED=(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase);
+if(SUPA_ENABLED){supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}
+
+// ========== STORAGE (cloud > window.storage > localStorage) ==========
+let CLOUD=null; // {userId, cache:{}}
+let syncTimer=null;
+
+async function saveData(key,value){
+  if(CLOUD){
+    CLOUD.cache[key]=value;
+    scheduleSync();
+    return;
+  }
+  try{if(window.storage){await window.storage.set(key,JSON.stringify(value))}else{localStorage.setItem(key,JSON.stringify(value))}}catch(e){console.error(e)}
+}
+async function loadData(key){
+  if(CLOUD){
+    return CLOUD.cache[key]!==undefined?CLOUD.cache[key]:null;
+  }
+  try{if(window.storage){const r=await window.storage.get(key);if(r&&r.value)return JSON.parse(r.value)}else{const ls=localStorage.getItem(key);if(ls)return JSON.parse(ls)}}catch(e){}
+  return null;
+}
+async function delData(key){
+  if(CLOUD){delete CLOUD.cache[key];scheduleSync();return}
+  try{if(window.storage){await window.storage.delete(key)}else{localStorage.removeItem(key)}}catch(e){}
+}
+function scheduleSync(){
+  if(!CLOUD)return;
+  if(syncTimer)clearTimeout(syncTimer);
+  syncTimer=setTimeout(doSync,1500);
+}
+async function doSync(){
+  if(!CLOUD||!supa)return;
+  try{
+    await supa.from('user_data').upsert({user_id:CLOUD.userId,data:CLOUD.cache,updated_at:new Date().toISOString()});
+  }catch(e){console.error('sync error',e)}
+}
+
+// ========== TOAST ==========
+function toast(msg,ms){
+  ms=ms||2000;
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show')},ms);
+}
+
+// ========== BOTTOM SHEET ==========
+function openSheet(title,bodyHTML){
+  document.getElementById('sheetTitle').textContent=title;
+  document.getElementById('sheetBody').innerHTML=bodyHTML;
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('sheetClose').addEventListener('click',closeSheet);
+document.getElementById('sheetOverlay').addEventListener('click',closeSheet);
+
+// ========== TAB SWITCHING ==========
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+// ========== SUB-NAV ==========
+document.querySelectorAll('.sub-tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    const group=t.dataset.sub;
+    document.querySelectorAll('.sub-tab[data-sub="'+group+'"]').forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');
+    const parent=t.closest('.section');
+    parent.querySelectorAll('.sub-section').forEach(function(s){s.classList.remove('active')});
+    document.getElementById(t.dataset.subTarget).classList.add('active');
+    if(t.dataset.subTarget==='w-hist')renderWorkoutHistory();
+    if(t.dataset.subTarget==='w-lib')renderLibrary();
+    if(t.dataset.subTarget==='t-lift')refreshLiftSelector();
+  });
+});
+
+// ========== CHECKLIST ==========
+const CHECK_KEY='tomoya_v4_checklist';
+const checkItems=document.querySelectorAll('.check-item');
+async function loadChecklist(){
+  const state=(await loadData(CHECK_KEY))||{};
+  checkItems.forEach(function(it){if(state[it.dataset.id])it.classList.add('checked')});
+  updateCheckProgress();
+}
+async function saveChecklist(){
+  const state={};
+  checkItems.forEach(function(it){if(it.classList.contains('checked'))state[it.dataset.id]=true});
+  await saveData(CHECK_KEY,state);
+}
+function updateCheckProgress(){
+  const done=document.querySelectorAll('.check-item.checked').length;
+  document.getElementById('checkedNum').textContent=done;
+  document.getElementById('topProgress').textContent=done;
+  document.getElementById('progressFill').style.width=(done/checkItems.length*100)+'%';
+}
+checkItems.forEach(function(it){
+  it.addEventListener('click',async function(){
+    it.classList.toggle('checked');
+    updateCheckProgress();
+    await saveChecklist();
+    if(typeof checkBadges==='function')checkBadges();
+  });
+});
+document.getElementById('resetBtn').addEventListener('click',async function(){
+  if(confirm('รีเซ็ต Checklist ทั้งหมด?')){
+    checkItems.forEach(function(it){it.classList.remove('checked')});
+    updateCheckProgress();
+    await saveChecklist();
+  }
+});
+
+// ========== PROTEIN CALC ==========
+let calcGoal=1.6;
+document.querySelectorAll('[data-goal]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-goal]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    calcGoal=parseFloat(b.dataset.goal);
+  });
+});
+document.getElementById('calcBtn').addEventListener('click',function(){
+  const h=parseFloat(document.getElementById('height').value);
+  if(!h||h<100||h>250){alert('ใส่ส่วนสูง 100-250 cm');return}
+  const ibw=h-100;
+  const protein=Math.round(ibw*calcGoal);
+  const hands=Math.round(protein/20);
+  document.getElementById('resIBW').textContent=ibw+' kg';
+  document.getElementById('resProtein').textContent=protein+' g';
+  document.getElementById('resHands').textContent=hands+' ฝ่ามือ';
+  let tip='';
+  if(calcGoal===1.6)tip='🎯 ลีน: '+protein+'g โปรตีน + DEFICIT 300-500 kcal';
+  else if(calcGoal===1.2)tip='⚖️ รักษา: '+protein+'g โปรตีน + พลังงานสมดุล';
+  else tip='💪 เพิ่มกล้าม: '+protein+'g + SURPLUS + ฝึกแรงต้าน';
+  document.getElementById('resTip').textContent=tip;
+  document.getElementById('calcResult').classList.add('show');
+});
+
+// ========== TDEE CALC ==========
+let tdeeAct=1.375;
+document.querySelectorAll('[data-tdee-act]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-tdee-act]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    tdeeAct=parseFloat(b.dataset.tdeeAct);
+  });
+});
+document.getElementById('tdeeCalcBtn').addEventListener('click',function(){
+  const age=parseFloat(document.getElementById('tdeeAge').value);
+  const w=parseFloat(document.getElementById('tdeeWeight').value);
+  const h=parseFloat(document.getElementById('tdeeHeight').value);
+  if(!age||!w||!h){alert('กรอกข้อมูลให้ครบ');return}
+  if(age<10||age>100){alert('อายุไม่ถูกต้อง');return}
+  if(w<30||w>250){alert('น้ำหนักไม่ถูกต้อง');return}
+  if(h<100||h>250){alert('ส่วนสูงไม่ถูกต้อง');return}
+  const bmr=10*w+6.25*h-5*age+5;
+  const tdee=Math.round(bmr*tdeeAct);
+  document.getElementById('resBMR').textContent=Math.round(bmr)+' kcal';
+  document.getElementById('resTDEE').textContent=tdee.toLocaleString()+' kcal';
+  document.getElementById('resLose').textContent=Math.round(tdee-400).toLocaleString();
+  document.getElementById('resMaintain').textContent=tdee.toLocaleString();
+  document.getElementById('resGain').textContent=Math.round(tdee+300).toLocaleString();
+  document.getElementById('tdeeResult').classList.add('show');
+});
+
+// ========== BODY WEIGHT TRACKER ==========
+const TRACK_KEY='tomoya_v4_bodylog';
+let weightLog=[];
+function formatDateShort(d){const x=new Date(d);return x.getDate()+'/'+(x.getMonth()+1)}
+function formatDateFull(d){const x=new Date(d);const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return x.getDate()+' '+m[x.getMonth()]}
+function sortLog(){weightLog.sort(function(a,b){return a.date.localeCompare(b.date)})}
+
+async function loadTracker(){
+  const data=await loadData(TRACK_KEY);
+  weightLog=Array.isArray(data)?data:[];
+  sortLog();
+  renderTracker();
+  document.getElementById('logDate').value=new Date().toISOString().slice(0,10);
+}
+async function saveTracker(){await saveData(TRACK_KEY,weightLog)}
+
+function renderStats(){
+  if(weightLog.length===0){
+    ['statStartW','statStartF','statCurrW','statCurrF','statDiffW','statDiffF'].forEach(function(id){
+      const e=document.getElementById(id);e.textContent='-';e.style.color='';
+    });
+    return;
+  }
+  const first=weightLog[0];
+  const last=weightLog[weightLog.length-1];
+  document.getElementById('statStartW').textContent=first.weight!=null?first.weight.toFixed(1):'-';
+  document.getElementById('statStartF').textContent=first.fat!=null?first.fat.toFixed(1):'-';
+  document.getElementById('statCurrW').textContent=last.weight!=null?last.weight.toFixed(1):'-';
+  document.getElementById('statCurrF').textContent=last.fat!=null?last.fat.toFixed(1):'-';
+  const dW=document.getElementById('statDiffW'),dF=document.getElementById('statDiffF');
+  if(first.weight!=null&&last.weight!=null){
+    const d=last.weight-first.weight;
+    dW.textContent=(d>0?'+':'')+d.toFixed(1);
+    dW.style.color=d<0?'var(--green)':(d>0?'var(--red)':'var(--gray)');
+  }else{dW.textContent='-';dW.style.color=''}
+  if(first.fat!=null&&last.fat!=null){
+    const d=last.fat-first.fat;
+    dF.textContent=(d>0?'+':'')+d.toFixed(1);
+    dF.style.color=d<0?'var(--green)':(d>0?'var(--red)':'var(--gray)');
+  }else{dF.textContent='-';dF.style.color=''}
+}
+
+function drawChart(containerId,data,key,color){
+  const c=document.getElementById(containerId);
+  if(!c)return;
+  const points=data.filter(function(d){return d[key]!=null});
+  if(points.length===0){
+    c.innerHTML='<div class="chart-empty"><div class="chart-empty-icon">📊</div>ยังไม่มีข้อมูล</div>';
+    return;
+  }
+  const isDark=document.body.getAttribute('data-theme')==='dark';
+  const gridColor=isDark?'#334155':'#E1E8F0';
+  const axisColor=isDark?'#64748B':'#8A9BAC';
+  const labelColor=isDark?'#94A3B8':'#5A6B7C';
+  const W=320,H=180,padL=38,padR=14,padT=20,padB=28;
+  const chartW=W-padL-padR,chartH=H-padT-padB;
+  const vals=points.map(function(p){return p[key]});
+  let min=Math.min.apply(null,vals),max=Math.max.apply(null,vals);
+  if(min===max){min-=1;max+=1}
+  const range=max-min;
+  min-=range*0.1;max+=range*0.1;
+  const sx=function(i){return padL+(points.length===1?chartW/2:(i/(points.length-1))*chartW)};
+  const sy=function(v){return padT+chartH-((v-min)/(max-min))*chartH};
+  let svg='<svg class="chart-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+  // gradient def
+  svg+='<defs><linearGradient id="grad_'+containerId+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity="0.25"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0.02"/></linearGradient></defs>';
+  for(let i=0;i<=3;i++){
+    const y=padT+(chartH/3)*i;
+    const v=max-(range*1.2/3)*i;
+    svg+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="'+gridColor+'" stroke-width="1"/>';
+    svg+='<text x="'+(padL-6)+'" y="'+(y+4)+'" font-size="9" fill="'+axisColor+'" text-anchor="end">'+v.toFixed(1)+'</text>';
+  }
+  // Trendline (linear regression) — needs 2+ points
+  if(points.length>=2){
+    let n=points.length,sumX=0,sumY=0,sumXY=0,sumXX=0;
+    points.forEach(function(p,i){sumX+=i;sumY+=p[key];sumXY+=i*p[key];sumXX+=i*i});
+    const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX);
+    const intercept=(sumY-slope*sumX)/n;
+    const ty1=slope*0+intercept,ty2=slope*(n-1)+intercept;
+    svg+='<line x1="'+sx(0)+'" y1="'+sy(ty1)+'" x2="'+sx(n-1)+'" y2="'+sy(ty2)+'" stroke="'+axisColor+'" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.7"/>';
+    svg+='<text x="'+(W-padR)+'" y="'+(sy(ty2)-5)+'" font-size="8" fill="'+axisColor+'" text-anchor="end" font-style="italic">แนวโน้ม</text>';
+  }
+  // smooth area + line
+  if(points.length>1){
+    function smoothPath(close){
+      let p='M '+sx(0)+' '+sy(points[0][key]);
+      for(let i=0;i<points.length-1;i++){
+        const x0=sx(i),y0=sy(points[i][key]);
+        const x1=sx(i+1),y1=sy(points[i+1][key]);
+        const cx=(x0+x1)/2;
+        p+=' C '+cx+' '+y0+' '+cx+' '+y1+' '+x1+' '+y1;
+      }
+      if(close)p+=' L '+sx(points.length-1)+' '+(padT+chartH)+' L '+sx(0)+' '+(padT+chartH)+' Z';
+      return p;
+    }
+    svg+='<path d="'+smoothPath(true)+'" fill="url(#grad_'+containerId+')"/>';
+    svg+='<path d="'+smoothPath(false)+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  points.forEach(function(p,i){
+    const cx=sx(i),cy=sy(p[key]);
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+(isDark?'#1E293B':'#fff')+'" stroke="'+color+'" stroke-width="2.5"/>';
+    const show=points.length<=6||i===0||i===points.length-1||i%Math.ceil(points.length/5)===0;
+    if(show)svg+='<text x="'+cx+'" y="'+(H-10)+'" font-size="9" fill="'+labelColor+'" text-anchor="middle">'+formatDateShort(p.date)+'</text>';
+  });
+  const last=points[points.length-1];
+  const lx=sx(points.length-1),ly=sy(last[key]);
+  svg+='<rect x="'+(lx-22)+'" y="'+(ly-22)+'" width="44" height="16" rx="8" fill="'+color+'"/>';
+  svg+='<text x="'+lx+'" y="'+(ly-11)+'" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">'+last[key].toFixed(1)+'</text>';
+  svg+='</svg>';
+  c.innerHTML=svg;
+}
+
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(weightLog.length===0){list.innerHTML='<div class="history-empty">ยังไม่มีบันทึก</div>';return}
+  let html='';
+  weightLog.slice().reverse().forEach(function(p){
+    html+='<div class="history-row"><div class="history-date">'+formatDateFull(p.date)+'</div><div class="history-val"><span class="lbl">นน.</span>'+(p.weight!=null?p.weight.toFixed(1)+'kg':'-')+'</div><div class="history-val"><span class="lbl">ไขมัน</span>'+(p.fat!=null?p.fat.toFixed(1)+'%':'-')+'</div><button class="history-del" data-del="'+p.date+'">✕</button></div>';
+  });
+  list.innerHTML=html;
+  list.querySelectorAll('[data-del]').forEach(function(b){
+    b.addEventListener('click',async function(){
+      if(confirm('ลบบันทึกนี้?')){
+        weightLog=weightLog.filter(function(p){return p.date!==b.dataset.del});
+        await saveTracker();renderTracker();
+      }
+    });
+  });
+}
+
+function renderTracker(){
+  renderStats();
+  drawChart('weightChart',weightLog,'weight','#FF6B35');
+  drawChart('fatChart',weightLog,'fat','#0EA5E9');
+  renderHistory();
+  document.getElementById('topLogCount').textContent=weightLog.length;
+}
+
+document.getElementById('logSaveBtn').addEventListener('click',async function(){
+  const date=document.getElementById('logDate').value;
+  const w=document.getElementById('logWeight').value;
+  const f=document.getElementById('logFat').value;
+  if(!date){alert('เลือกวันที่');return}
+  if(!w&&!f){alert('กรอกอย่างน้อย 1 ค่า');return}
+  const weight=w?parseFloat(w):null;
+  const fat=f?parseFloat(f):null;
+  if(weight!=null&&(weight<20||weight>300)){alert('น้ำหนักไม่ถูกต้อง');return}
+  if(fat!=null&&(fat<3||fat>70)){alert('% ไขมันไม่ถูกต้อง');return}
+  weightLog=weightLog.filter(function(p){return p.date!==date});
+  weightLog.push({date:date,weight:weight,fat:fat});
+  sortLog();
+  await saveTracker();
+  renderTracker();
+  document.getElementById('logWeight').value='';
+  document.getElementById('logFat').value='';
+  toast('✓ บันทึกแล้ว');
+  if(typeof checkBadges==='function')checkBadges();
+});
+
+document.getElementById('resetTrackerBtn').addEventListener('click',async function(){
+  if(confirm('ลบบันทึกทั้งหมด?')){weightLog=[];await saveTracker();renderTracker()}
+});
+
+// ========== EXERCISE DATABASE ==========
+const EXERCISES={
+  'bench-press':{name:'Barbell Bench Press',th:'เบนช์เพรส',muscle:'chest',equip:'🏋️',icon:'🏋️',sets:'3-4',reps:'8-12',desc:'ท่าหลักสร้างกล้ามอกส่วนกลาง ราชาของท่าอก',steps:['นอนหงาย เท้าวางพื้นแน่น','จับบาร์กว้างกว่าหัวไหล่เล็กน้อย','หย่อนบาร์ลงมาที่กลางอก','ดันขึ้นเหยียดแขน หายใจออก'],tips:'รักษาหลังโค้งธรรมชาติ สะบักหุบเข้า บาร์อย่าเด้งที่อก'},
+  'incline-db-press':{name:'Incline Dumbbell Press',th:'อินไคลน์ดัมเบลเพรส',muscle:'chest',equip:'🔩',icon:'💪',sets:'3-4',reps:'8-12',desc:'เน้นกล้ามอกส่วนบน ที่หลายคนยังไม่ค่อยพัฒนา',steps:['ปรับเบนช์ 30-45 องศา','ถือดัมเบลข้างละมือ ใกล้อก','ดันขึ้นพร้อมกัน เกือบเหยียดแขน','หย่อนลงช้าๆ ควบคุม'],tips:'เริ่มน้ำหนักเบา เน้นบีบกล้ามอก ไม่ต้องชนกันที่ยอด'},
+  'db-bench':{name:'Dumbbell Bench Press',th:'ดัมเบลเบนช์เพรส',muscle:'chest',equip:'🔩',icon:'💪',sets:'3-4',reps:'8-12',desc:'ดีกว่า Barbell ที่ Range of Motion มากกว่า',steps:['นอนหงาย ถือดัมเบลใกล้อก','ดันขึ้นเหยียดแขน','หย่อนลงให้รู้สึกตึงที่อก','ดันขึ้นพร้อมกัน'],tips:'ระวังตอนตั้งดัมเบลขึ้น ใช้เข่าช่วยส่ง'},
+  'db-fly':{name:'Dumbbell Fly',th:'ดัมเบลฟลาย',muscle:'chest',equip:'🔩',icon:'💪',sets:'3',reps:'10-15',desc:'แยกกล้ามอก เน้น Stretch ขยายการเคลื่อนไหว',steps:['นอนหงาย ถือดัมเบลเหยียดแขนตรงเหนืออก','กางแขนออกข้างจนรู้สึกอกตึง','ดึงกลับด้วยอก ไม่ใช่แขน','บีบที่ยอด'],tips:'แขนงอเล็กน้อยตลอด น้ำหนักเบาๆ พอ'},
+  'cable-cross':{name:'Cable Crossover',th:'เคเบิลครอสโอเวอร์',muscle:'chest',equip:'🪢',icon:'🪢',sets:'3',reps:'12-15',desc:'เก็บรายละเอียดอก peak contraction',steps:['ยืนกลางเคเบิล 2 ข้าง','ดึงเคเบิลทั้ง 2 มาไขว้ที่ระดับอก','บีบอก 1-2 วินาที','คืนตำแหน่งช้าๆ'],tips:'โน้มตัวมาด้านหน้าเล็กน้อย ปรับมุมโดนอกบน/ล่าง'},
+  'push-up':{name:'Push Up',th:'พุชอัพ',muscle:'chest',equip:'🧘',icon:'🧘',sets:'3',reps:'10-25',desc:'พื้นฐาน ใช้แค่ตัวเรา เริ่มยังไงก็ทำได้',steps:['ตั้งท่าแพลงค์ มือกว้างกว่าไหล่','หย่อนตัวลงจนอกใกล้พื้น','ดันตัวขึ้นเหยียดแขน','รักษาหลังตรง'],tips:'ถ้ายากเริ่มจากเข่าพื้น ลำตัวต้องเป็นเส้นตรง'},
+  'pull-up':{name:'Pull Up',th:'พูลอัพ',muscle:'back',equip:'🧘',icon:'🧘',sets:'3-4',reps:'6-12',desc:'ท่าหลังที่ดีที่สุด ใช้น้ำหนักตัว',steps:['จับบาร์เหนือศีรษะ คว่ำมือ','ห้อยตัว สะบักผ่อนคลาย','ดึงตัวขึ้นจนคางเหนือบาร์','หย่อนลงช้าๆ'],tips:'ทำไม่ได้ใช้ Assisted Pull Up หรือ Lat Pulldown แทน',alt:'ดึงไม่ขึ้น? ไล่ระดับนี้: 1) เครื่อง Lat Pulldown (ดึงบาร์ลง) 2) Assisted Pull-up เครื่องช่วยดึง 3) Negative Pull-up กระโดดขึ้นแล้วค่อยๆ หย่อนลง 4 วินาที พอแข็งแรงค่อยดึงเองเต็มตัว'},
+  'lat-pulldown':{name:'Lat Pulldown',th:'แลทพูลดาวน์',muscle:'back',equip:'🪢',icon:'🪢',sets:'3-4',reps:'10-12',desc:'พัฒนาหลังกว้าง ทรง V-shape',steps:['นั่ง จับบาร์กว้างกว่าไหล่','ดึงบาร์ลงมาที่อกบน','บีบสะบักเข้าหากัน','คืนช้าๆ เหยียดแขนเต็ม'],tips:'อกแอ่นเล็กน้อย ดึงด้วยข้อศอก ไม่ใช่มือ'},
+  'barbell-row':{name:'Barbell Row',th:'บาร์เบลโรว์',muscle:'back',equip:'🏋️',icon:'🏋️',sets:'3-4',reps:'8-12',desc:'พัฒนาหลังหนา ขาดไม่ได้',steps:['ก้มตัว 45 องศา เข่างอเล็กน้อย','จับบาร์กว้างกว่าไหล่','ดึงบาร์มาที่ท้องล่าง','คืนช้าๆ'],tips:'หลังตรง ไม่ใช้แรงสะโพกเขย่า',alt:'ก้มแล้วปวดหลัง? เปลี่ยนเป็น: 1) Seated Cable Row นั่งดึง 2) Dumbbell Row ใช้เบนช์รองรับ ปลอดภัยกับหลังกว่า'},
+  'db-row':{name:'Dumbbell Row',th:'ดัมเบลโรว์',muscle:'back',equip:'🔩',icon:'💪',sets:'3',reps:'10-12 ข้างละ',desc:'หลังข้างละข้าง แก้กล้ามไม่สมมาตร',steps:['วางเข่าและมือบนเบนช์','ถือดัมเบลด้วยอีกข้าง','ดึงดัมเบลขึ้นมาที่สีข้าง','คืนช้าๆ'],tips:'ดึงด้วยข้อศอก อย่าหมุนสะโพก'},
+  'cable-row':{name:'Seated Cable Row',th:'นั่งเคเบิลโรว์',muscle:'back',equip:'🪢',icon:'🪢',sets:'3-4',reps:'10-12',desc:'หลังกลาง ปลอดภัย คุมง่าย',steps:['นั่งหน้าเครื่อง เท้าดันแผ่น','ดึงเคเบิลมาที่ท้องล่าง','บีบสะบักเข้าหากัน','คืนช้าๆ'],tips:'หลังตรง ไม่โยกตัว'},
+  'deadlift':{name:'Deadlift',th:'เดดลิฟต์',muscle:'back',equip:'🏋️',icon:'🏋️',sets:'3-4',reps:'5-8',desc:'ท่ารวมเต็มตัว ราชาท่าทั้งหมด',steps:['ยืนเท้ากว้างเท่าไหล่ บาร์ใกล้แข้ง','ก้มลงจับบาร์ หลังตรง','ยกบาร์ขึ้นใช้สะโพกและขา','คืนช้าๆ ควบคุม'],tips:'⚠️ ท่ายาก ศึกษา form ให้ดี เริ่มน้ำหนักเบา',alt:'ยังไม่มั่นใจ? เริ่มจาก: 1) Romanian Deadlift (RDL) น้ำหนักเบา เน้นฟอร์ม 2) เครื่อง Back Extension 3) Dumbbell RDL ใช้ดัมเบลแทนบาร์ ควบคุมง่ายกว่า'},
+  'shoulder-press':{name:'Shoulder Press',th:'โชลเดอร์เพรส',muscle:'shoulders',equip:'🔩',icon:'💪',sets:'3-4',reps:'8-12',desc:'ท่าหลักสร้างไหล่ใหญ่ มัด deltoid ทั้งสามส่วน',steps:['นั่งหรือยืน ถือดัมเบลที่ระดับหู','ดันขึ้นเหนือศีรษะ','คืนช้าๆ ที่ระดับหู','รักษาแกนกลางตึง'],tips:'อย่าโค้งหลัง ฝ่ามือหันหน้า'},
+  'lateral-raise':{name:'Lateral Raise',th:'ลาเทอรัลเรซ',muscle:'shoulders',equip:'🔩',icon:'💪',sets:'3-4',reps:'12-15',desc:'เน้นไหล่ข้าง ทำให้ไหล่กว้าง',steps:['ยืน ถือดัมเบลข้างละมือ','ยกออกข้างจนแขนขนานพื้น','ค้าง 1 วินาที','คืนช้าๆ'],tips:'น้ำหนักเบา ฟอร์มสำคัญกว่า ข้อศอกงอเล็กน้อย'},
+  'rear-fly':{name:'Rear Delt Fly',th:'รีเวิร์สฟลาย',muscle:'shoulders',equip:'🔩',icon:'💪',sets:'3',reps:'12-15',desc:'เน้นไหล่หลัง ที่หลายคนลืม',steps:['ก้มตัว 45 องศา ถือดัมเบลเหยียดลง','กางแขนออกข้างจนขนานพื้น','บีบสะบัก','คืนช้าๆ'],tips:'แขนงอเล็กน้อย เน้นรู้สึกที่หลังไหล่'},
+  'face-pull':{name:'Face Pull',th:'เฟซพูล',muscle:'shoulders',equip:'🪢',icon:'🪢',sets:'3',reps:'12-15',desc:'ไหล่หลัง + บุคลิกภาพดี แก้หลังค่อม',steps:['ตั้งเคเบิลสูงกว่าศีรษะ','ใช้เชือก จับฝ่ามือหันใน','ดึงเชือกมาที่ใบหน้า','บีบสะบักเข้าหากัน'],tips:'ทำสม่ำเสมอ ช่วยทรงตัวได้ชัด'},
+  'squat':{name:'Barbell Squat',th:'สควอท',muscle:'legs',equip:'🏋️',icon:'🏋️',sets:'3-4',reps:'8-12',desc:'ราชาแห่งท่าขา โดนทั้งขาและก้น',steps:['วางบาร์บนหลังบน (Traps)','เท้ากว้างเท่าไหล่ ปลายเท้าเฉียงออก','นั่งลงเหมือนนั่งเก้าอี้','ลงจนต้นขาขนานพื้น'],tips:'หลังตรง เข่าตามแนวปลายเท้า ส้นเท้าติดพื้น',alt:'นั่งลงลึกไม่ได้/เสียบาลานซ์? เริ่มจาก: 1) Bodyweight Squat ไม่ใส่น้ำหนัก 2) เครื่อง Leg Press 3) Goblet Squat ถือดัมเบลหน้าอก ช่วยถ่วงให้ทรงตัวง่ายขึ้น'},
+  'leg-press':{name:'Leg Press',th:'เลกเพรส',muscle:'legs',equip:'⚙️',icon:'⚙️',sets:'3-4',reps:'10-15',desc:'ปลอดภัยกว่า Squat เน้นขาล้วน',steps:['นั่งบนเครื่อง เท้าวางแผ่นกว้างเท่าไหล่','ดันแผ่นขึ้น เหยียดเข่า','หย่อนลงให้เข่างอ 90 องศา','ดันขึ้นต่อ'],tips:'อย่าเหยียดเข่าจนล็อก เท้าทั้งฝ่าแตะแผ่น'},
+  'rdl':{name:'Romanian Deadlift',th:'โรมาเนียนเดดลิฟต์',muscle:'legs',equip:'🏋️',icon:'🏋️',sets:'3-4',reps:'8-12',desc:'เน้นต้นขาหลัง (Hamstring) + ก้น',steps:['ยืนถือบาร์ที่ต้นขา','ก้มตัวลงไปข้างหน้า สะโพกถอยหลัง','รู้สึก stretch ที่ต้นขาหลัง','ยืนตัวขึ้น บีบก้น'],tips:'หลังตรงตลอด เข่างอเล็กน้อย'},
+  'leg-curl':{name:'Leg Curl',th:'เลกเคิร์ล',muscle:'legs',equip:'⚙️',icon:'⚙️',sets:'3',reps:'12-15',desc:'เน้นต้นขาหลัง แยกชัดเจน',steps:['นอนคว่ำ ตำแหน่งขาถูกต้อง','งอเข่า ดึงน้ำหนักขึ้นมาที่ก้น','บีบ 1 วินาที','คืนช้าๆ'],tips:'อย่าใช้สะโพกเขย่า เน้นรู้สึกที่ต้นขาหลัง'},
+  'leg-ext':{name:'Leg Extension',th:'เลกเอ็กซ์เทนชั่น',muscle:'legs',equip:'⚙️',icon:'⚙️',sets:'3',reps:'12-15',desc:'เน้นต้นขาหน้า (Quads)',steps:['นั่งบนเครื่อง ปรับให้เข่าตรงกับแกน','เหยียดเข่าขึ้นจนตรง','บีบ 1 วินาที','คืนช้าๆ'],tips:'อย่าเหยียดเข่าจนเร่ง ระวังคนเข่ามีปัญหา'},
+  'lunge':{name:'Lunge',th:'ลันจ์',muscle:'legs',equip:'🔩',icon:'💪',sets:'3',reps:'10-12 ข้าง',desc:'ขาสมดุล + Core stability',steps:['ยืนถือดัมเบลข้างละมือ','ก้าวเท้าไปข้างหน้า','หย่อนสะโพกลง เข่าหลังเกือบติดพื้น','ดันกลับมายืน'],tips:'เข่าหน้าไม่เกินปลายเท้า ตัวตรง'},
+  'calf-raise':{name:'Calf Raise',th:'น่อง',muscle:'legs',equip:'🔩',icon:'💪',sets:'4',reps:'15-20',desc:'พัฒนาน่อง เน้นรอบเยอะ',steps:['ยืนปลายเท้าบนขอบ','ยกส้นเท้าขึ้นสูงสุด','บีบน่อง 1 วินาที','หย่อนช้าๆ'],tips:'Full ROM สำคัญที่สุด ทำช้าๆ ตึง'},
+  'barbell-curl':{name:'Barbell Curl',th:'บาร์เบลเคิร์ล',muscle:'biceps',equip:'🏋️',icon:'🏋️',sets:'3-4',reps:'8-12',desc:'ราชาท่าไบเซป ใหญ่ขึ้นเร็วที่สุด',steps:['ยืนถือบาร์เบล ฝ่ามือหันออก','ข้อศอกแนบลำตัว','เคิร์ลขึ้นมาที่ไหล่','คืนช้าๆ'],tips:'อย่าโยกตัว ข้อศอกอยู่กับที่'},
+  'db-curl':{name:'Dumbbell Curl',th:'ดัมเบลเคิร์ล',muscle:'biceps',equip:'🔩',icon:'💪',sets:'3',reps:'10-12',desc:'ทำได้ทีละข้าง แก้กล้ามไม่สมมาตร',steps:['ยืนถือดัมเบลข้างละมือ','เคิร์ลข้างหนึ่งขึ้น พร้อมหมุนมือ','บีบที่ยอด','คืนช้าๆ สลับข้าง'],tips:'หมุนข้อมือเพื่อโดนไบเซปเต็ม'},
+  'hammer-curl':{name:'Hammer Curl',th:'แฮมเมอร์เคิร์ล',muscle:'biceps',equip:'🔩',icon:'💪',sets:'3',reps:'10-12',desc:'เน้น Brachialis แขนหนาขึ้น',steps:['ยืนถือดัมเบลแบบ neutral grip','เคิร์ลขึ้นเหมือนกุมค้อน','บีบที่ยอด','คืนช้าๆ'],tips:'ฝ่ามือหันเข้าตลอด ทำสลับซ้าย-ขวา'},
+  'preacher-curl':{name:'Preacher Curl',th:'พรีชเชอร์เคิร์ล',muscle:'biceps',equip:'⚙️',icon:'⚙️',sets:'3',reps:'10-12',desc:'ไอโซเลทไบเซปเต็มที่ ไม่มีโยก',steps:['นั่งที่ Preacher Bench','วางต้นแขนบนแผ่น','เคิร์ลขึ้นมาเต็มท่า','คืนช้าๆ จนเหยียด'],tips:'อย่าโซลเก่า เน้นการเหยียดตอนคืน'},
+  'tricep-pushdown':{name:'Tricep Pushdown',th:'ไทรเซปพุชดาวน์',muscle:'triceps',equip:'🪢',icon:'🪢',sets:'3-4',reps:'10-12',desc:'ท่าหลักไทรเซป แขนใหญ่ที่หลัง',steps:['ยืนหน้าเคเบิลสูง จับบาร์','ข้อศอกแนบลำตัว','ดันบาร์ลงเหยียดแขน','คืนช้าๆ'],tips:'ข้อศอกอยู่กับที่ บีบไทรเซปที่ยอด'},
+  'skull-crusher':{name:'Skull Crusher',th:'สกัลครัชเชอร์',muscle:'triceps',equip:'🏋️',icon:'🏋️',sets:'3',reps:'10-12',desc:'ไทรเซปยาว ที่เห็นเป็นเกือกม้า',steps:['นอนหงาย ถือบาร์เหยียดแขน','งอเฉพาะข้อศอก หย่อนบาร์ลงหน้าผาก','เหยียดแขนขึ้นกลับ','ข้อศอกอยู่กับที่'],tips:'ระวังบาร์ตกใส่หน้า น้ำหนักเบาก่อน',alt:'กลัวบาร์ตกใส่หน้า? เริ่มจาก Tricep Pushdown เคเบิล ปลอดภัยกว่าและคุมง่าย'},
+  'overhead-ext':{name:'Overhead Tricep Extension',th:'โอเวอร์เฮดไทรเซป',muscle:'triceps',equip:'🔩',icon:'💪',sets:'3',reps:'10-12',desc:'ไทรเซปยาวด้านใน ส่วนที่หลายคนละเลย',steps:['ยืนหรือนั่ง ถือดัมเบลสองมือเหนือศีรษะ','งอข้อศอก หย่อนดัมเบลลงด้านหลัง','เหยียดแขนขึ้นกลับ','ข้อศอกชี้ขึ้น'],tips:'เคลื่อนไหวเฉพาะข้อศอก ตัวอย่าโยก',alt:'ไหล่ตึงยกเหนือหัวไม่ไหว? เปลี่ยนเป็น Tricep Pushdown เคเบิล หรือ Skull Crusher แทน'},
+  'close-grip':{name:'Close Grip Bench',th:'โคลสกริปเบนช์',muscle:'triceps',equip:'🏋️',icon:'🏋️',sets:'3',reps:'8-12',desc:'ไทรเซป + อก คอมพาวด์',steps:['นอนหงาย จับบาร์ใกล้กัน','ข้อศอกแนบลำตัว','หย่อนบาร์ลงอกล่าง','ดันขึ้นเหยียดแขน'],tips:'อย่าจับใกล้เกินไป ข้อศอกอย่ากาง'},
+  'crunch':{name:'Crunch',th:'ครันช์',muscle:'abs',equip:'🧘',icon:'🧘',sets:'3',reps:'15-25',desc:'ท่าพื้นฐานท้อง ทำที่ไหนก็ได้',steps:['นอนหงาย เข่างอ','มือไขว้หน้าอกหรือข้างหู','ยกตัวขึ้นจากพื้นโดยเกร็งท้อง','คืนช้าๆ'],tips:'ไม่ดึงคอ ใช้กล้ามท้องล้วน'},
+  'plank':{name:'Plank',th:'แพลงค์',muscle:'abs',equip:'🧘',icon:'🧘',sets:'3',reps:'30-60 วิ',desc:'Core stability ที่ดีที่สุด',steps:['ตั้งท่ามือและปลายเท้า','ลำตัวเป็นเส้นตรง','เกร็งท้อง ก้น และต้นขา','ค้างไว้ตามเวลา'],tips:'สะโพกอย่ายุบหรือยก หายใจปกติ'},
+  'russian-twist':{name:'Russian Twist',th:'รัสเซียนทวิสต์',muscle:'abs',equip:'🧘',icon:'🧘',sets:'3',reps:'20-30',desc:'ท้องด้านข้าง (Obliques)',steps:['นั่ง เข่างอ ปลายเท้าลอยจากพื้น','โน้มตัวมาด้านหลังเล็กน้อย','หมุนตัวจากข้างหนึ่งไปอีกข้าง','ค่อยๆ ทำ'],tips:'ถือน้ำหนักได้ถ้าง่ายเกินไป'},
+  'hanging-leg':{name:'Hanging Leg Raise',th:'แฮงกิ้งเลกเรซ',muscle:'abs',equip:'🧘',icon:'🧘',sets:'3',reps:'8-15',desc:'ท้องล่าง ระดับสูง',steps:['ห้อยตัวจากบาร์','ยกขาทั้งสองข้างขึ้นจน 90 องศา','เกร็งท้อง','หย่อนช้าๆ'],tips:'อย่าแกว่งตัว ทำช้าๆ'}
+};
+
+// ========== PROGRAMS ==========
+const PROGRAMS={
+  'ppl':{name:'Push Pull Leg',days:{'push':{name:'PUSH',focus:'อก ไหล่ ไทรเซป',exercises:['bench-press','incline-db-press','shoulder-press','lateral-raise','tricep-pushdown']},'pull':{name:'PULL',focus:'หลัง ไบเซป',exercises:['pull-up','barbell-row','lat-pulldown','face-pull','barbell-curl','hammer-curl']},'leg':{name:'LEG',focus:'ขา ท้อง',exercises:['squat','leg-press','rdl','leg-curl','plank','hanging-leg']}}},
+  '5day':{name:'5-Day Split',days:{'chest':{name:'อก',focus:'หน้าอก',exercises:['bench-press','incline-db-press','db-fly','cable-cross','push-up']},'back':{name:'หลัง',focus:'กล้ามหลัง',exercises:['pull-up','lat-pulldown','barbell-row','db-row','deadlift']},'shoulder':{name:'ไหล่',focus:'ไหล่ 3 มัด',exercises:['shoulder-press','lateral-raise','rear-fly','face-pull']},'arm':{name:'แขน',focus:'ไบเซป + ไทรเซป',exercises:['barbell-curl','hammer-curl','preacher-curl','tricep-pushdown','skull-crusher','overhead-ext']},'leg':{name:'ขา',focus:'ขาทั้งตัว',exercises:['squat','leg-press','rdl','leg-curl','leg-ext','lunge','calf-raise']}}}
+};
+
+// ========== WORKOUT STATE ==========
+const WORKOUT_KEY='tomoya_v4_workoutlog';
+let workoutLog=[];
+let currentProgram='ppl';
+let currentDay='push';
+let currentSession={exercises:[]};
+
+async function loadWorkoutLog(){
+  const data=await loadData(WORKOUT_KEY);
+  workoutLog=Array.isArray(data)?data:[];
+  document.getElementById('topWorkoutCount').textContent=workoutLog.length;
+}
+async function saveWorkoutLog(){await saveData(WORKOUT_KEY,workoutLog)}
+
+function getCurrentDayData(){
+  return PROGRAMS[currentProgram].days[currentDay];
+}
+
+function renderDayChips(){
+  const wrap=document.getElementById('dayChips');
+  const days=PROGRAMS[currentProgram].days;
+  let html='';
+  Object.keys(days).forEach(function(key){
+    const cls=key===currentDay?'day-chip active':'day-chip';
+    html+='<button class="'+cls+'" data-day="'+key+'">'+days[key].name+'</button>';
+  });
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('[data-day]').forEach(function(b){
+    b.addEventListener('click',function(){
+      currentDay=b.dataset.day;
+      // reset session
+      currentSession={exercises:[]};
+      const day=getCurrentDayData();
+      day.exercises.forEach(function(eid){currentSession.exercises.push({id:eid,sets:[{weight:'',reps:''}]})});
+      renderDayChips();
+      renderDayHeader();
+      renderExercises();
+    });
+  });
+}
+
+function renderDayHeader(){
+  const day=getCurrentDayData();
+  document.getElementById('dayHeaderName').textContent=day.name;
+  document.getElementById('dayHeaderFocus').textContent=day.focus;
+  document.getElementById('dayExCount').textContent=currentSession.exercises.length;
+}
+
+function renderExercises(){
+  const list=document.getElementById('exerciseList');
+  if(currentSession.exercises.length===0){
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">💪</div><div class="empty-text">ยังไม่มีท่า<br>เพิ่มจากคลังด้านล่าง</div></div>';
+    return;
+  }
+  let html='';
+  currentSession.exercises.forEach(function(ex,idx){
+    const e=EXERCISES[ex.id];
+    if(!e)return;
+    html+='<div class="exercise-card" data-idx="'+idx+'">';
+    html+='<div class="exercise-row">';
+    html+='<div class="exercise-img">'+e.icon+'</div>';
+    html+='<div class="exercise-info">';
+    html+='<div class="exercise-name">'+e.th+'</div>';
+    html+='<div class="exercise-meta"><span>'+e.equip+' '+e.name+'</span></div>';
+    html+='</div>';
+    html+='<div class="exercise-act">';
+    html+='<button class="icon-btn info-btn" data-ex="'+ex.id+'">ℹ️</button>';
+    html+='<button class="icon-btn toggle-btn">▼</button>';
+    html+='<button class="icon-btn del-ex-btn" data-idx="'+idx+'">✕</button>';
+    html+='</div>';
+    html+='</div>';
+    html+='<div class="set-list">';
+    ex.sets.forEach(function(set,sidx){
+      html+='<div class="set-row">';
+      html+='<div class="set-num">'+(sidx+1)+'</div>';
+      html+='<input type="number" class="set-input" placeholder="kg" inputmode="decimal" step="0.5" value="'+(set.weight||'')+'" data-set="weight" data-idx="'+idx+'" data-sidx="'+sidx+'">';
+      html+='<input type="number" class="set-input" placeholder="reps" inputmode="numeric" value="'+(set.reps||'')+'" data-set="reps" data-idx="'+idx+'" data-sidx="'+sidx+'">';
+      html+='<button class="set-del" data-idx="'+idx+'" data-sidx="'+sidx+'">✕</button>';
+      html+='</div>';
+    });
+    html+='<button class="set-add" data-idx="'+idx+'">+ เพิ่ม Set</button>';
+    html+='<div style="display:flex;gap:6px;margin-top:6px"><button class="rest-trigger" data-rest="60" style="flex:1;background:#F0F4F8;border:1.5px dashed var(--border);color:var(--gray);padding:8px;border-radius:8px;font-family:inherit;font-weight:600;font-size:12px;cursor:pointer">⏱️ พัก 60 วิ</button><button class="rest-trigger" data-rest="90" style="flex:1;background:#F0F4F8;border:1.5px dashed var(--border);color:var(--gray);padding:8px;border-radius:8px;font-family:inherit;font-weight:600;font-size:12px;cursor:pointer">⏱️ พัก 90 วิ</button></div>';
+    html+='</div>';
+    html+='</div>';
+  });
+  list.innerHTML=html;
+  document.getElementById('dayExCount').textContent=currentSession.exercises.length;
+  attachExerciseHandlers();
+}
+
+function attachExerciseHandlers(){
+  document.querySelectorAll('.exercise-row').forEach(function(row){
+    row.addEventListener('click',function(e){
+      if(e.target.closest('.exercise-act'))return;
+      row.parentElement.classList.toggle('expanded');
+    });
+  });
+  document.querySelectorAll('.info-btn').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      openExerciseDetail(b.dataset.ex);
+    });
+  });
+  document.querySelectorAll('.toggle-btn').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      b.closest('.exercise-card').classList.toggle('expanded');
+    });
+  });
+  document.querySelectorAll('.del-ex-btn').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      const idx=parseInt(b.dataset.idx);
+      if(confirm('ลบท่านี้?')){
+        currentSession.exercises.splice(idx,1);
+        renderExercises();
+      }
+    });
+  });
+  document.querySelectorAll('.set-input').forEach(function(inp){
+    inp.addEventListener('input',function(){
+      const idx=parseInt(inp.dataset.idx);
+      const sidx=parseInt(inp.dataset.sidx);
+      const field=inp.dataset.set;
+      currentSession.exercises[idx].sets[sidx][field]=inp.value;
+    });
+  });
+  document.querySelectorAll('.set-del').forEach(function(b){
+    b.addEventListener('click',function(){
+      const idx=parseInt(b.dataset.idx);
+      const sidx=parseInt(b.dataset.sidx);
+      if(currentSession.exercises[idx].sets.length>1){
+        currentSession.exercises[idx].sets.splice(sidx,1);
+        renderExercises();
+        const card=document.querySelectorAll('.exercise-card')[idx];
+        if(card)card.classList.add('expanded');
+      }
+    });
+  });
+  document.querySelectorAll('.set-add').forEach(function(b){
+    b.addEventListener('click',function(){
+      const idx=parseInt(b.dataset.idx);
+      currentSession.exercises[idx].sets.push({weight:'',reps:''});
+      renderExercises();
+      const card=document.querySelectorAll('.exercise-card')[idx];
+      if(card)card.classList.add('expanded');
+    });
+  });
+  document.querySelectorAll('.rest-trigger').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      startRestTimer(parseInt(b.dataset.rest));
+    });
+  });
+}
+
+function openExerciseDetail(exId){
+  const e=EXERCISES[exId];
+  if(!e)return;
+  let html='<div class="ex-detail-img">'+e.icon+'</div>';
+  html+='<div class="ex-detail-meta">';
+  html+='<span class="ex-tag muscle">'+e.muscle+'</span>';
+  html+='<span class="ex-tag equip">'+e.equip+' '+e.name+'</span>';
+  html+='<span class="ex-tag">'+e.sets+' SET × '+e.reps+'</span>';
+  html+='</div>';
+  html+='<div class="ex-section"><div class="ex-section-title">📝 รายละเอียด</div><div style="font-size:14px;color:#3D4F60">'+e.desc+'</div></div>';
+  html+='<div class="ex-section"><div class="ex-section-title">👣 วิธีทำ</div><ol class="ex-steps">';
+  e.steps.forEach(function(s){html+='<li>'+s+'</li>'});
+  html+='</ol></div>';
+  html+='<div class="ex-tips"><strong>💡 เคล็ดลับ:</strong> '+e.tips+'</div>';
+  if(e.alt){html+='<div class="alt-box"><strong>🔄 ทำท่านี้ยังไม่ได้?</strong><br>'+e.alt+'</div>'}
+  openSheet(e.th,html);
+}
+
+// Program switching
+document.querySelectorAll('[data-program]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-program]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    currentProgram=b.dataset.program;
+    currentDay=Object.keys(PROGRAMS[currentProgram].days)[0];
+    currentSession={exercises:[]};
+    const day=getCurrentDayData();
+    day.exercises.forEach(function(eid){currentSession.exercises.push({id:eid,sets:[{weight:'',reps:''}]})});
+    renderDayChips();
+    renderDayHeader();
+    renderExercises();
+  });
+});
+
+// Save workout
+document.getElementById('saveWorkoutBtn').addEventListener('click',async function(){
+  let hasData=false;
+  const cleanedExercises=currentSession.exercises.map(function(ex){
+    const cleanSets=ex.sets.filter(function(s){return s.weight!==''&&s.reps!==''});
+    if(cleanSets.length>0)hasData=true;
+    return {id:ex.id,sets:cleanSets.map(function(s){return {weight:parseFloat(s.weight),reps:parseInt(s.reps)}})};
+  }).filter(function(ex){return ex.sets.length>0});
+  if(!hasData){alert('กรอกน้ำหนัก × ครั้งอย่างน้อย 1 SET');return}
+  const date=new Date().toISOString().slice(0,10);
+  workoutLog.push({date:date,program:currentProgram,day:currentDay,exercises:cleanedExercises});
+  await saveWorkoutLog();
+  document.getElementById('topWorkoutCount').textContent=workoutLog.length;
+  toast('✓ บันทึกการเล่นแล้ว');
+  if(typeof checkBadges==='function')checkBadges();
+});
+
+// Add exercise from library
+document.getElementById('addExerciseBtn').addEventListener('click',function(){
+  let html='<div style="margin-bottom:12px;color:var(--gray);font-size:13px">แตะท่าที่ต้องการเพิ่ม</div>';
+  Object.keys(EXERCISES).forEach(function(eid){
+    const e=EXERCISES[eid];
+    const already=currentSession.exercises.some(function(x){return x.id===eid});
+    if(already)return;
+    html+='<div class="exercise-card" style="margin-bottom:8px" data-add="'+eid+'">';
+    html+='<div class="exercise-row">';
+    html+='<div class="exercise-img">'+e.icon+'</div>';
+    html+='<div class="exercise-info"><div class="exercise-name">'+e.th+'</div><div class="exercise-meta"><span>'+e.equip+' '+e.muscle+'</span></div></div>';
+    html+='<div class="icon-btn primary">+</div>';
+    html+='</div></div>';
+  });
+  openSheet('เพิ่มท่าจากคลัง',html);
+  document.querySelectorAll('[data-add]').forEach(function(c){
+    c.addEventListener('click',function(){
+      currentSession.exercises.push({id:c.dataset.add,sets:[{weight:'',reps:''}]});
+      renderExercises();
+      closeSheet();
+      toast('✓ เพิ่มท่าแล้ว');
+    });
+  });
+});
+
+// ========== LIBRARY ==========
+let currentMuscleFilter='all';
+document.querySelectorAll('[data-muscle]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-muscle]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    currentMuscleFilter=b.dataset.muscle;
+    renderLibrary();
+  });
+});
+
+function renderLibrary(){
+  const grid=document.getElementById('libGrid');
+  let html='';
+  Object.keys(EXERCISES).forEach(function(eid){
+    const e=EXERCISES[eid];
+    if(currentMuscleFilter!=='all'&&e.muscle!==currentMuscleFilter)return;
+    html+='<div class="lib-card" data-ex="'+eid+'">';
+    html+='<div class="lib-card-img">'+e.icon+'</div>';
+    html+='<div class="lib-card-name">'+e.th+'</div>';
+    html+='<div class="lib-card-muscle">'+e.muscle+'</div>';
+    html+='</div>';
+  });
+  if(html===''){
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div class="empty-text">ไม่มีท่าในหมวดนี้</div></div>';
+  }else{
+    grid.innerHTML=html;
+    grid.querySelectorAll('[data-ex]').forEach(function(c){
+      c.addEventListener('click',function(){openExerciseDetail(c.dataset.ex)});
+    });
+  }
+}
+
+// ========== WORKOUT HISTORY ==========
+function renderWorkoutHistory(){
+  const list=document.getElementById('workoutHistList');
+  if(workoutLog.length===0){
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">ยังไม่มีบันทึกการเล่น<br>เริ่มเล่นในแท็บโปรแกรม</div></div>';
+    return;
+  }
+  let html='';
+  workoutLog.slice().reverse().forEach(function(w,i){
+    const realIdx=workoutLog.length-1-i;
+    const prog=PROGRAMS[w.program];
+    const day=prog?prog.days[w.day]:null;
+    let totalSets=0;
+    w.exercises.forEach(function(ex){totalSets+=ex.sets.length});
+    html+='<div class="exercise-card" data-w-idx="'+realIdx+'">';
+    html+='<div class="exercise-row">';
+    html+='<div class="exercise-img" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff">💪</div>';
+    html+='<div class="exercise-info">';
+    html+='<div class="exercise-name">'+formatDateFull(w.date)+' · '+(day?day.name:'-')+'</div>';
+    html+='<div class="exercise-meta"><span>'+w.exercises.length+' ท่า · '+totalSets+' SET</span></div>';
+    html+='</div>';
+    html+='<button class="icon-btn del-w-btn" data-w-del="'+realIdx+'">✕</button>';
+    html+='</div></div>';
+  });
+  list.innerHTML=html;
+  list.querySelectorAll('.exercise-row').forEach(function(r){
+    r.addEventListener('click',function(e){
+      if(e.target.closest('.del-w-btn'))return;
+      const idx=parseInt(r.closest('[data-w-idx]').dataset.wIdx);
+      openWorkoutDetail(idx);
+    });
+  });
+  list.querySelectorAll('.del-w-btn').forEach(function(b){
+    b.addEventListener('click',async function(){
+      if(confirm('ลบบันทึกนี้?')){
+        workoutLog.splice(parseInt(b.dataset.wDel),1);
+        await saveWorkoutLog();
+        document.getElementById('topWorkoutCount').textContent=workoutLog.length;
+        renderWorkoutHistory();
+      }
+    });
+  });
+}
+
+function openWorkoutDetail(idx){
+  const w=workoutLog[idx];
+  if(!w)return;
+  const prog=PROGRAMS[w.program];
+  const day=prog?prog.days[w.day]:null;
+  let html='<div style="margin-bottom:12px;color:var(--gray);font-size:13px">'+formatDateFull(w.date)+' · '+(day?day.name:'-')+'</div>';
+  w.exercises.forEach(function(ex){
+    const e=EXERCISES[ex.id];
+    if(!e)return;
+    html+='<div class="card" style="margin-bottom:10px;padding:12px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:22px">'+e.icon+'</div><div style="font-weight:700;font-size:14px">'+e.th+'</div></div>';
+    ex.sets.forEach(function(s,i){
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--border);font-size:13px"><span style="color:var(--accent);font-weight:700">SET '+(i+1)+'</span><span><strong>'+s.weight+' kg</strong> × '+s.reps+' ครั้ง</span></div>';
+    });
+    html+='</div>';
+  });
+  openSheet('รายละเอียดการเล่น',html);
+}
+
+// ========== LIFT PROGRESS ==========
+function refreshLiftSelector(){
+  const sel=document.getElementById('liftSelect');
+  // Get unique exercise IDs from workout log
+  const usedIds={};
+  workoutLog.forEach(function(w){w.exercises.forEach(function(ex){usedIds[ex.id]=true})});
+  let opts='<option value="">-- เลือกท่า --</option>';
+  Object.keys(usedIds).forEach(function(eid){
+    const e=EXERCISES[eid];
+    if(e)opts+='<option value="'+eid+'">'+e.icon+' '+e.th+'</option>';
+  });
+  sel.innerHTML=opts;
+}
+document.getElementById('liftSelect').addEventListener('change',function(e){
+  const exId=e.target.value;
+  if(!exId){
+    document.getElementById('liftStats').style.display='none';
+    document.getElementById('liftChartCard').style.display='none';
+    document.getElementById('liftEmpty').style.display='block';
+    return;
+  }
+  // Build progress data: max weight per session
+  const data=[];
+  workoutLog.forEach(function(w){
+    const ex=w.exercises.find(function(x){return x.id===exId});
+    if(ex&&ex.sets.length>0){
+      const maxW=Math.max.apply(null,ex.sets.map(function(s){return s.weight}));
+      data.push({date:w.date,weight:maxW});
+    }
+  });
+  data.sort(function(a,b){return a.date.localeCompare(b.date)});
+  if(data.length===0){
+    document.getElementById('liftStats').style.display='none';
+    document.getElementById('liftChartCard').style.display='none';
+    document.getElementById('liftEmpty').style.display='block';
+    return;
+  }
+  document.getElementById('liftStats').style.display='grid';
+  document.getElementById('liftChartCard').style.display='block';
+  document.getElementById('liftEmpty').style.display='none';
+  document.getElementById('liftStart').textContent=data[0].weight.toFixed(1);
+  document.getElementById('liftCurr').textContent=data[data.length-1].weight.toFixed(1);
+  const diff=data[data.length-1].weight-data[0].weight;
+  const diffEl=document.getElementById('liftDiff');
+  diffEl.textContent=(diff>0?'+':'')+diff.toFixed(1);
+  diffEl.style.color=diff>0?'var(--green)':(diff<0?'var(--red)':'var(--gray)');
+  drawChart('liftChart',data,'weight','#2E7D32');
+});
+
+// ========== PHOTO GALLERY ==========
+const PHOTO_INDEX_KEY='tomoya_v4_photoindex';
+let photoIndex=[];
+let currentAngle='front';
+
+async function loadPhotoIndex(){
+  const data=await loadData(PHOTO_INDEX_KEY);
+  photoIndex=Array.isArray(data)?data:[];
+  renderAngleCounts();
+  renderAnglePreviews();
+}
+async function savePhotoIndex(){await saveData(PHOTO_INDEX_KEY,photoIndex)}
+
+function renderAngleCounts(){
+  ['front','side','back'].forEach(function(a){
+    const c=photoIndex.filter(function(p){return p.angle===a}).length;
+    const el=document.getElementById('cnt'+a.charAt(0).toUpperCase()+a.slice(1));
+    if(el)el.textContent=c;
+  });
+}
+
+async function renderAnglePreviews(){
+  for(const a of ['front','side','back']){
+    const list=photoIndex.filter(function(p){return p.angle===a}).sort(function(x,y){return y.date.localeCompare(x.date)});
+    const prev=document.getElementById('prev'+a.charAt(0).toUpperCase()+a.slice(1));
+    if(list.length>0){
+      const photo=await loadData('tomoya_v4_photo_'+list[0].id);
+      if(photo){
+        prev.innerHTML='<img src="'+photo+'" alt=""><div class="photo-badge">'+list.length+'</div>';
+      }
+    }
+  }
+}
+
+// Photo angle click - open gallery
+document.querySelectorAll('.photo-angle').forEach(function(el){
+  el.addEventListener('click',function(){
+    currentAngle=el.dataset.angle;
+    openPhotoGallery();
+  });
+});
+
+async function openPhotoGallery(){
+  const angleNames={front:'ด้านหน้า',side:'ด้านข้าง',back:'ด้านหลัง'};
+  const list=photoIndex.filter(function(p){return p.angle===currentAngle}).sort(function(x,y){return y.date.localeCompare(x.date)});
+  let html='<button class="btn-primary" id="captureBtn" style="margin-bottom:14px">📷 ถ่าย/เพิ่มรูปใหม่</button>';
+  if(list.length>=2){
+    html+='<button class="btn-secondary btn-water" id="genGifBtn" style="margin-bottom:14px;background:linear-gradient(135deg,var(--water),#0284C7);color:#fff;border:none">🎬 สร้าง GIF Progress ('+list.length+' รูป)</button>';
+  }
+  html+='<div style="font-family:Prompt,sans-serif;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--gray)">📋 รูปทั้งหมด ('+list.length+')</div>';
+  if(list.length===0){
+    html+='<div class="gallery-empty">ยังไม่มีรูปด้านนี้ ลองเพิ่มดูสิ!</div>';
+  }else{
+    html+='<div class="gallery">';
+    for(let i=0;i<list.length;i++){
+      html+='<div class="gallery-item" data-pid="'+list[i].id+'"><div style="width:100%;height:100%;background:#F0F4F8;display:flex;align-items:center;justify-content:center">⏳</div><div class="gallery-date">'+formatDateShort(list[i].date)+'</div></div>';
+    }
+    html+='</div>';
+  }
+  openSheet('รูป'+angleNames[currentAngle],html);
+  // Load images lazily
+  for(const item of list){
+    const photo=await loadData('tomoya_v4_photo_'+item.id);
+    const el=document.querySelector('[data-pid="'+item.id+'"]');
+    if(el&&photo){
+      el.innerHTML='<img src="'+photo+'" alt=""><div class="gallery-date">'+formatDateShort(item.date)+'</div>';
+      el.addEventListener('click',function(){openPhotoViewer(item.id,item.date,currentAngle)});
+    }
+  }
+  const captureBtn=document.getElementById('captureBtn');
+  if(captureBtn)captureBtn.addEventListener('click',function(){
+    document.getElementById('photoInput').click();
+  });
+  const gifBtn=document.getElementById('genGifBtn');
+  if(gifBtn)gifBtn.addEventListener('click',function(){generateGIF(currentAngle)});
+}
+
+// Photo input handler
+document.getElementById('photoInput').addEventListener('change',async function(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  toast('⏳ กำลังบีบอัด...');
+  try{
+    const dataUrl=await compressImage(file);
+    const id='p_'+Date.now();
+    const date=new Date().toISOString().slice(0,10);
+    photoIndex.push({id:id,date:date,angle:currentAngle});
+    await saveData('tomoya_v4_photo_'+id,dataUrl);
+    await savePhotoIndex();
+    renderAngleCounts();
+    await renderAnglePreviews();
+    closeSheet();
+    setTimeout(function(){openPhotoGallery()},300);
+    toast('✓ บันทึกรูปแล้ว');
+  }catch(err){
+    console.error(err);
+    toast('❌ เกิดข้อผิดพลาด');
+  }
+  e.target.value='';
+});
+
+function compressImage(file){
+  return new Promise(function(resolve,reject){
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        const canvas=document.createElement('canvas');
+        const MAX=800;
+        let w=img.width,h=img.height;
+        if(w>h){if(w>MAX){h*=MAX/w;w=MAX}}
+        else{if(h>MAX){w*=MAX/h;h=MAX}}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',0.75));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Photo viewer
+async function openPhotoViewer(id,date,angle){
+  const photo=await loadData('tomoya_v4_photo_'+id);
+  if(!photo)return;
+  const angleNames={front:'ด้านหน้า',side:'ด้านข้าง',back:'ด้านหลัง'};
+  document.getElementById('photoViewerImg').src=photo;
+  document.getElementById('photoViewerInfo').textContent=formatDateFull(date)+' · '+angleNames[angle];
+  document.getElementById('photoViewer').classList.add('open');
+  // Long press to delete
+  document.getElementById('photoViewerImg').onclick=async function(){
+    if(confirm('ลบรูปนี้?')){
+      photoIndex=photoIndex.filter(function(p){return p.id!==id});
+      await delData('tomoya_v4_photo_'+id);
+      await savePhotoIndex();
+      renderAngleCounts();
+      await renderAnglePreviews();
+      closePhotoViewer();
+      closeSheet();
+    }
+  };
+}
+function closePhotoViewer(){document.getElementById('photoViewer').classList.remove('open')}
+document.getElementById('photoViewerClose').addEventListener('click',closePhotoViewer);
+
+// ========== GIF GENERATION ==========
+async function generateGIF(angle){
+  const list=photoIndex.filter(function(p){return p.angle===angle}).sort(function(a,b){return a.date.localeCompare(b.date)});
+  if(list.length<2){toast('ต้องมีอย่างน้อย 2 รูป');return}
+  
+  // Show progress sheet
+  let html='<div style="text-align:center;padding:20px"><div style="font-size:60px;margin-bottom:14px">🎬</div><div style="font-family:Prompt,sans-serif;font-weight:700;font-size:18px;margin-bottom:8px">กำลังสร้าง GIF...</div><div id="gifStatus" style="font-size:13px;color:var(--gray);margin-bottom:14px">เตรียมรูป...</div><div style="width:100%;height:8px;background:#E1E8F0;border-radius:4px;overflow:hidden"><div id="gifBar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--water),var(--accent));transition:width .3s"></div></div></div>';
+  openSheet('สร้าง GIF Progress',html);
+  
+  try{
+    // Load all images
+    const images=[];
+    for(let i=0;i<list.length;i++){
+      const data=await loadData('tomoya_v4_photo_'+list[i].id);
+      if(data){
+        const img=new Image();
+        await new Promise(function(res){img.onload=res;img.src=data});
+        images.push({img:img,date:list[i].date});
+      }
+      document.getElementById('gifStatus').textContent='โหลดรูป '+(i+1)+'/'+list.length;
+      document.getElementById('gifBar').style.width=((i+1)/list.length*30)+'%';
+    }
+    
+    if(images.length<2){toast('ไม่สามารถโหลดรูปได้');closeSheet();return}
+    
+    // Find common dimension
+    const W=400,H=Math.round(W*4/3);
+    
+    document.getElementById('gifStatus').textContent='เริ่มสร้าง GIF...';
+    
+    const gif=new GIF({
+      workers:2,
+      quality:10,
+      width:W,
+      height:H,
+      workerScript:'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+    });
+    
+    // Add frames
+    for(let i=0;i<images.length;i++){
+      const canvas=document.createElement('canvas');
+      canvas.width=W;canvas.height=H;
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#000';
+      ctx.fillRect(0,0,W,H);
+      // Fit image
+      const img=images[i].img;
+      const scale=Math.min(W/img.width,H/img.height);
+      const dw=img.width*scale,dh=img.height*scale;
+      const dx=(W-dw)/2,dy=(H-dh)/2;
+      ctx.drawImage(img,dx,dy,dw,dh);
+      // Add date label
+      ctx.fillStyle='rgba(0,0,0,0.7)';
+      ctx.fillRect(0,H-40,W,40);
+      ctx.fillStyle='#fff';
+      ctx.font='bold 18px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(formatDateFull(images[i].date),W/2,H-15);
+      gif.addFrame(canvas,{delay:800,copy:true});
+    }
+    
+    gif.on('progress',function(p){
+      document.getElementById('gifStatus').textContent='เรนเดอร์ '+Math.round(p*100)+'%';
+      document.getElementById('gifBar').style.width=(30+p*70)+'%';
+    });
+    
+    gif.on('finished',function(blob){
+      const url=URL.createObjectURL(blob);
+      const angleNames={front:'ด้านหน้า',side:'ด้านข้าง',back:'ด้านหลัง'};
+      let resultHtml='<div style="text-align:center;padding:10px"><div style="font-family:Prompt,sans-serif;font-weight:800;font-size:18px;color:var(--accent);margin-bottom:14px">🎉 สร้างสำเร็จ!</div><img src="'+url+'" style="width:100%;border-radius:14px;margin-bottom:14px"><a href="'+url+'" download="tomoya-progress-'+angle+'.gif" class="btn-primary" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px">⬇️ ดาวน์โหลด GIF</a><div style="font-size:12px;color:var(--gray);margin-top:8px">เก็บไว้แชร์ใน Story ดู Progress ของคุณ!</div></div>';
+      document.getElementById('sheetBody').innerHTML=resultHtml;
+      document.getElementById('sheetTitle').textContent='Progress GIF '+angleNames[angle];
+    });
+    
+    gif.render();
+  }catch(err){
+    console.error(err);
+    toast('❌ สร้าง GIF ไม่สำเร็จ');
+    closeSheet();
+  }
+}
+
+// ========== AI CHAT ==========
+const chatMessages=document.getElementById('chatMessages');
+const chatInput=document.getElementById('chatInput');
+const chatSendBtn=document.getElementById('chatSendBtn');
+let chatHistory=[];
+
+const SYSTEM_PROMPT='คุณคือผู้ช่วย AI ของพี่โทโมยะ Personal Trainer สอนเรื่องเล่นเวท โภชนาการ การลีน และไลฟ์สไตล์สุขภาพ ตอบเป็นภาษาไทย กระชับ 3-5 ประโยค เป็นกันเอง เรียกผู้ใช้ว่า "น้อง" เน้นปรัชญา "หาน้ำของตัวเอง" ไม่ต้องแข่งกับใคร ถ้าคำถามไม่เกี่ยวฟิตเนสให้เบี่ยงเรื่องสุขภาพ ถ้าเรื่องโรคหรือบาดเจ็บให้แนะนำปรึกษาแพทย์';
+
+function addMessage(role,text){
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  div.textContent=text;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+  return div;
+}
+function addTyping(){
+  const div=document.createElement('div');
+  div.className='msg typing';
+  div.id='typingMsg';
+  div.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+function removeTyping(){
+  const el=document.getElementById('typingMsg');
+  if(el)el.remove();
+}
+
+function toGeminiContents(history){
+  return history.map(function(m){
+    return {role:(m.role==='assistant'?'model':'user'),parts:[{text:m.content}]};
+  });
+}
+function parseGeminiReply(data){
+  try{
+    if(data&&data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts){
+      return data.candidates[0].content.parts.map(function(p){return p.text||''}).join('').trim();
+    }
+  }catch(e){}
+  return '';
+}
+
+async function sendChat(text){
+  if(!text||!text.trim())return;
+  text=text.trim();
+  addMessage('user',text);
+  chatInput.value='';
+  chatSendBtn.disabled=true;
+  chatHistory.push({role:'user',content:text});
+  addTyping();
+
+  const ownKey=localStorage.getItem('tomoya_ai_key')||'';
+  try{
+    let response;
+    if(ownKey){
+      // โหมดใส่ key เอง (เรียก Gemini ตรงจากเบราว์เซอร์)
+      const geminiBody={
+        contents:toGeminiContents(chatHistory),
+        generationConfig:{maxOutputTokens:600,temperature:0.7}
+      };
+      if(SYSTEM_PROMPT)geminiBody.system_instruction={parts:[{text:SYSTEM_PROMPT}]};
+      response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-goog-api-key':ownKey},
+        body:JSON.stringify(geminiBody)
+      });
+    }else{
+      // โหมดหลังบ้าน Netlify Function (ปลอดภัย ไม่เปิด key)
+      response=await fetch('/.netlify/functions/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({system:SYSTEM_PROMPT,messages:chatHistory})
+      });
+    }
+    removeTyping();
+    if(!response.ok){
+      let hint='ขอโทษน้อง AI งีบนิดหน่อย ลองใหม่อีกครั้งนะ 🙏';
+      if(response.status===404)hint='ยังไม่ได้ตั้งค่า AI หลังบ้านนะน้อง — ไปที่ ⚙️ ตั้งค่า แล้วใส่ Gemini API Key หรือทำตามคู่มือติดตั้ง Netlify Function ก่อนนะ';
+      if(response.status===400||response.status===403)hint='API Key อาจไม่ถูกต้องนะน้อง ลองเช็คใน ⚙️ ตั้งค่าอีกที';
+      addMessage('ai',hint);
+      chatSendBtn.disabled=false;
+      return;
+    }
+    const data=await response.json();
+    let reply=parseGeminiReply(data);
+    if(!reply){
+      // เผื่อโดน safety block หรือไม่มีคำตอบ
+      if(data&&data.promptFeedback&&data.promptFeedback.blockReason){
+        reply='คำถามนี้ AI ตอบไม่ได้นะน้อง ลองถามใหม่แบบอื่นดู 🙏';
+      }else{
+        reply='ขอโทษน้อง ลองถามใหม่อีกครั้งได้ไหม?';
+      }
+    }
+    chatHistory.push({role:'assistant',content:reply});
+    addMessage('ai',reply);
+  }catch(err){
+    removeTyping();
+    console.error(err);
+    addMessage('ai','ขอโทษน้อง การเชื่อมต่อมีปัญหา ลองเช็คอินเทอร์เน็ต หรือไปตั้งค่า ⚙️ ใส่ Gemini API Key ก็ได้นะ 🙏');
+  }
+  chatSendBtn.disabled=false;
+}
+
+chatSendBtn.addEventListener('click',function(){sendChat(chatInput.value)});
+chatInput.addEventListener('keydown',function(e){if(e.key==='Enter')sendChat(chatInput.value)});
+document.querySelectorAll('.quick-btn').forEach(function(b){
+  b.addEventListener('click',function(){sendChat(b.dataset.q)});
+});
+
+// Initial AI greeting
+addMessage('ai','สวัสดีน้อง! AI โทโมยะนะ 👋\n\nถามได้เลยเรื่องเวท การกิน หรือลีน — พี่ฝึก AI ไว้ตอบแทน 24/7\n\nลองกดคำถามด้านล่างได้เลย หรือพิมพ์ถามเองก็ได้');
+
+// ========== AUTH (Supabase) ==========
+let loginMode='login';
+function showLogin(){document.getElementById('loginScreen').classList.add('show')}
+function hideLogin(){document.getElementById('loginScreen').classList.remove('show')}
+function setLoginError(msg){document.getElementById('loginError').textContent=msg||''}
+
+if(document.getElementById('tabLogin')){
+  document.getElementById('tabLogin').addEventListener('click',function(){
+    loginMode='login';
+    this.classList.add('active');
+    document.getElementById('tabSignup').classList.remove('active');
+    document.getElementById('loginSubmit').textContent='เข้าสู่ระบบ';
+    setLoginError('');
+  });
+  document.getElementById('tabSignup').addEventListener('click',function(){
+    loginMode='signup';
+    this.classList.add('active');
+    document.getElementById('tabLogin').classList.remove('active');
+    document.getElementById('loginSubmit').textContent='สมัครสมาชิก';
+    setLoginError('');
+  });
+  document.getElementById('loginSubmit').addEventListener('click',async function(){
+    if(!supa){setLoginError('ยังไม่ได้ตั้งค่า Supabase');return}
+    const email=document.getElementById('loginEmail').value.trim();
+    const pw=document.getElementById('loginPassword').value;
+    if(!email||!pw){setLoginError('กรอกอีเมลและรหัสผ่าน');return}
+    if(pw.length<6){setLoginError('รหัสผ่านอย่างน้อย 6 ตัว');return}
+    setLoginError('');
+    this.textContent='กำลังโหลด...';
+    this.disabled=true;
+    try{
+      let res;
+      if(loginMode==='signup'){
+        res=await supa.auth.signUp({email:email,password:pw});
+        if(res.error)throw res.error;
+        if(res.data&&res.data.session){await onLoggedIn(res.data.session.user)}
+        else{setLoginError('สมัครสำเร็จ! เช็คอีเมลเพื่อยืนยัน แล้วเข้าสู่ระบบ');}
+      }else{
+        res=await supa.auth.signInWithPassword({email:email,password:pw});
+        if(res.error)throw res.error;
+        if(res.data&&res.data.session){await onLoggedIn(res.data.session.user)}
+      }
+    }catch(err){
+      let m=err.message||'เกิดข้อผิดพลาด';
+      if(m.indexOf('Invalid login')>=0)m='อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+      if(m.indexOf('already registered')>=0)m='อีเมลนี้สมัครแล้ว ลองเข้าสู่ระบบ';
+      setLoginError(m);
+    }
+    this.textContent=loginMode==='signup'?'สมัครสมาชิก':'เข้าสู่ระบบ';
+    this.disabled=false;
+  });
+  document.getElementById('loginGoogle').addEventListener('click',async function(){
+    if(!supa){setLoginError('ยังไม่ได้ตั้งค่า Supabase');return}
+    await supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  });
+  document.getElementById('loginSkip').addEventListener('click',function(){
+    localStorage.setItem('tomoya_skip_login','1');
+    hideLogin();
+    initApp();
+  });
+}
+
+async function onLoggedIn(user){
+  // โหลดข้อมูลจาก cloud
+  CLOUD={userId:user.id,cache:{}};
+  try{
+    const res=await supa.from('user_data').select('data').eq('user_id',user.id).maybeSingle();
+    if(res.data&&res.data.data){
+      CLOUD.cache=res.data.data;
+    }else{
+      // ครั้งแรก: ย้ายข้อมูลจาก localStorage ขึ้น cloud
+      migrateLocalToCloud();
+      await doSync();
+    }
+  }catch(e){console.error('load cloud',e)}
+  hideLogin();
+  updateAccountUI(user);
+  await initApp();
+}
+
+function migrateLocalToCloud(){
+  const keys=['tomoya_v4_checklist','tomoya_v4_bodylog','tomoya_v4_workoutlog','tomoya_v4_photoindex'];
+  keys.forEach(function(k){
+    const v=localStorage.getItem(k);
+    if(v){try{CLOUD.cache[k]=JSON.parse(v)}catch(e){}}
+  });
+  // photos
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.indexOf('tomoya_v4_photo_')===0){try{CLOUD.cache[k]=JSON.parse(localStorage.getItem(k))}catch(e){}}
+  }
+}
+
+async function checkSession(){
+  if(!supa)return false;
+  try{
+    const res=await supa.auth.getSession();
+    if(res.data&&res.data.session){
+      await onLoggedIn(res.data.session.user);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+let currentUserEmail='';
+function updateAccountUI(user){currentUserEmail=user?(user.email||'บัญชีของคุณ'):''}
+
+async function logout(){
+  if(supa){await supa.auth.signOut()}
+  CLOUD=null;
+  localStorage.removeItem('tomoya_skip_login');
+  location.reload();
+}
+
+// ========== SETTINGS ==========
+document.getElementById('settingsBtn').addEventListener('click',openSettings);
+function openSettings(){
+  const dark=localStorage.getItem('tomoya_theme')==='dark';
+  const key=localStorage.getItem('tomoya_ai_key')||'';
+  let html='';
+  // Account
+  html+='<div class="settings-row"><div><div class="settings-label">บัญชี</div><div class="settings-desc">'+(CLOUD?(currentUserEmail||'เข้าสู่ระบบแล้ว ☁️'):(SUPA_ENABLED?'ยังไม่ล็อกอิน (เก็บในเครื่อง)':'โหมดเก็บในเครื่อง'))+'</div></div>';
+  if(CLOUD){html+='<button class="settings-btn danger" id="setLogout">ออกจากระบบ</button>'}
+  else if(SUPA_ENABLED){html+='<button class="settings-btn" id="setLogin">เข้าสู่ระบบ</button>'}
+  html+='</div>';
+  // Dark mode
+  html+='<div class="settings-row"><div><div class="settings-label">🌙 โหมดมืด</div><div class="settings-desc">Dark mode ถนอมสายตา</div></div><button class="toggle'+(dark?' on':'')+'" id="setDark"></button></div>';
+  // AI key
+  html+='<div class="settings-row" style="flex-direction:column;align-items:stretch"><div style="margin-bottom:8px"><div class="settings-label">🤖 Gemini API Key (ทางเลือก)</div><div class="settings-desc">ถ้าไม่ได้ตั้ง Netlify Function ใส่ Google Gemini key เองได้ (เก็บในเครื่องนี้เท่านั้น) — ขอฟรีที่ aistudio.google.com</div></div><input type="password" class="input-field" id="setAiKey" placeholder="AIza... (Gemini API Key)" value="'+key+'" style="margin-bottom:8px"><button class="settings-btn" id="setSaveKey">บันทึก Key</button></div>';
+  // Data backup
+  html+='<div class="settings-row" style="flex-direction:column;align-items:stretch"><div style="margin-bottom:8px"><div class="settings-label">💾 สำรองข้อมูล</div><div class="settings-desc">ดาวน์โหลด/นำเข้าข้อมูลทั้งหมด เผื่อเปลี่ยนเครื่อง</div></div><div style="display:flex;gap:8px"><button class="settings-btn" id="setExport" style="flex:1">⬇️ ส่งออก</button><button class="settings-btn" id="setImport" style="flex:1">⬆️ นำเข้า</button></div></div>';
+  openSheet('⚙️ ตั้งค่า',html);
+  // handlers
+  const dl=document.getElementById('setLogout');if(dl)dl.addEventListener('click',function(){if(confirm('ออกจากระบบ?'))logout()});
+  const li=document.getElementById('setLogin');if(li)li.addEventListener('click',function(){closeSheet();showLogin()});
+  document.getElementById('setDark').addEventListener('click',function(){
+    this.classList.toggle('on');
+    const on=this.classList.contains('on');
+    applyTheme(on?'dark':'light');
+    localStorage.setItem('tomoya_theme',on?'dark':'light');
+    refreshChartsTheme();
+  });
+  document.getElementById('setSaveKey').addEventListener('click',function(){
+    const v=document.getElementById('setAiKey').value.trim();
+    if(v)localStorage.setItem('tomoya_ai_key',v);else localStorage.removeItem('tomoya_ai_key');
+    toast('✓ บันทึก Key แล้ว');
+  });
+  document.getElementById('setExport').addEventListener('click',exportData);
+  document.getElementById('setImport').addEventListener('click',importData);
+}
+
+function applyTheme(t){
+  if(t==='dark')document.body.setAttribute('data-theme','dark');
+  else document.body.removeAttribute('data-theme');
+}
+function refreshChartsTheme(){
+  renderTracker();
+  const sel=document.getElementById('liftSelect');
+  if(sel&&sel.value){const e={target:sel};sel.dispatchEvent(new Event('change'))}
+}
+
+// ========== EXPORT / IMPORT ==========
+async function gatherAllData(){
+  const out={_app:'tomoya_lean',_version:5,_date:new Date().toISOString()};
+  const keys=['tomoya_v4_checklist','tomoya_v4_bodylog','tomoya_v4_workoutlog','tomoya_v4_photoindex'];
+  for(const k of keys){const v=await loadData(k);if(v!=null)out[k]=v}
+  // photos
+  const idx=await loadData('tomoya_v4_photoindex');
+  if(Array.isArray(idx)){
+    for(const p of idx){const pd=await loadData('tomoya_v4_photo_'+p.id);if(pd)out['tomoya_v4_photo_'+p.id]=pd}
+  }
+  return out;
+}
+async function exportData(){
+  toast('⏳ กำลังเตรียมไฟล์...');
+  const data=await gatherAllData();
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='tomoya-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  toast('✓ ส่งออกข้อมูลแล้ว');
+}
+function importData(){
+  const inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='application/json,.json';
+  inp.onchange=function(e){
+    const file=e.target.files[0];
+    if(!file)return;
+    const reader=new FileReader();
+    reader.onload=async function(ev){
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(data._app!=='tomoya_lean'){if(!confirm('ไฟล์อาจไม่ใช่ของแอปนี้ นำเข้าต่อไหม?'))return}
+        if(!confirm('นำเข้าข้อมูลจะเขียนทับข้อมูลปัจจุบัน ดำเนินการต่อ?'))return;
+        for(const k in data){if(k.indexOf('tomoya_')===0)await saveData(k,data[k])}
+        toast('✓ นำเข้าสำเร็จ! กำลังโหลดใหม่...');
+        setTimeout(function(){location.reload()},1200);
+      }catch(err){alert('ไฟล์ไม่ถูกต้อง');}
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// ========== REST TIMER ==========
+let restInterval=null,restRemaining=0,restTotal=60;
+const REST_RING=150.8;
+function startRestTimer(sec){
+  sec=sec||60;
+  restTotal=sec;restRemaining=sec;
+  document.getElementById('restTimer').classList.add('show');
+  updateRestDisplay();
+  if(restInterval)clearInterval(restInterval);
+  restInterval=setInterval(function(){
+    restRemaining--;
+    if(restRemaining<=0){stopRestTimer();toast('💪 พร้อมเซ็ตถัดไป!');return}
+    updateRestDisplay();
+  },1000);
+}
+function updateRestDisplay(){
+  const m=Math.floor(restRemaining/60),s=restRemaining%60;
+  document.getElementById('restTime').textContent=m+':'+(s<10?'0':'')+s;
+  const off=REST_RING*(1-restRemaining/restTotal);
+  document.getElementById('restRing').style.strokeDashoffset=off;
+}
+function stopRestTimer(){
+  if(restInterval)clearInterval(restInterval);
+  document.getElementById('restTimer').classList.remove('show');
+}
+document.getElementById('restSkip').addEventListener('click',stopRestTimer);
+document.getElementById('restAdd').addEventListener('click',function(){restRemaining+=15;restTotal+=15;updateRestDisplay()});
+
+// ========== BADGES / MILESTONES ==========
+const BADGE_KEY='tomoya_v4_badges';
+let earnedBadges={};
+async function loadBadges(){earnedBadges=(await loadData(BADGE_KEY))||{}}
+async function awardBadge(id,icon,title,desc,msg){
+  if(earnedBadges[id])return;
+  earnedBadges[id]=true;
+  await saveData(BADGE_KEY,earnedBadges);
+  document.getElementById('badgeIcon').textContent=icon;
+  document.getElementById('badgeTitle').textContent=title;
+  document.getElementById('badgeDesc').textContent=desc;
+  document.getElementById('badgeMsg').textContent=msg;
+  document.getElementById('badgePop').classList.add('show');
+}
+document.getElementById('badgeClose').addEventListener('click',function(){document.getElementById('badgePop').classList.remove('show')});
+document.getElementById('badgePop').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
+
+function checkBadges(){
+  const checked=document.querySelectorAll('.check-item.checked').length;
+  if(checked>=1)awardBadge('first_action','🌱','ก้าวแรกแล้ว!','เริ่ม Action แรกของคุณ','เห็นน้องเริ่มแล้วพี่ดีใจมาก! ก้าวแรกยากที่สุด ที่เหลือสบายแล้ว 💪');
+  if(checked>=8)awardBadge('half_action','🔥','ครึ่งทางแล้ว!','ทำ Action ได้ 8 ข้อ','เกินครึ่งแล้วน้อง! วินัยกำลังก่อตัว อย่าหยุดนะ');
+  if(checked>=16)awardBadge('all_action','👑','ครบทุก Action!','ทำครบทั้ง 16 ข้อ','สุดยอดไปเลยน้อง! ครบทุกข้อ นี่คือคนที่จะเปลี่ยนหุ่นได้จริง ภูมิใจในตัวน้องมาก');
+  // workout milestones
+  if(workoutLog.length>=1)awardBadge('first_workout','💪','เล่นเวทครั้งแรก!','บันทึกการเล่นครั้งแรก','ครั้งแรกผ่านไปแล้ว! จำความรู้สึกนี้ไว้ แล้วกลับมาอีกเรื่อยๆ นะ');
+  if(workoutLog.length>=10)awardBadge('ten_workout','⚡','เล่นครบ 10 ครั้ง!','สม่ำเสมอสุดๆ','10 ครั้งแล้วน้อง! ความสม่ำเสมอนี่แหละคือความลับ ไม่ใช่ความหนัก');
+  // body log streak (4 weeks)
+  if(weightLog.length>=4)awardBadge('four_log','📈','บันทึกครบ 4 ครั้ง!','ติดตามผลต่อเนื่อง','น้องติดตามตัวเองได้ดีมาก! คนที่จดคือคนที่เห็นความเปลี่ยนแปลง');
+}
+
+// ========== INIT ==========
+async function initApp(){
+  await loadChecklist();
+  await loadTracker();
+  await loadWorkoutLog();
+  await loadPhotoIndex();
+  await loadBadges();
+  currentSession={exercises:[]};
+  currentDay=Object.keys(PROGRAMS[currentProgram].days)[0];
+  const day=getCurrentDayData();
+  day.exercises.forEach(function(eid){currentSession.exercises.push({id:eid,sets:[{weight:'',reps:''}]})});
+  renderDayChips();
+  renderDayHeader();
+  renderExercises();
+}
+
+applyTheme(localStorage.getItem('tomoya_theme')||'light');
+
+async function bootstrap(){
+  if(SUPA_ENABLED){
+    const hasSession=await checkSession();
+    if(!hasSession){
+      if(localStorage.getItem('tomoya_skip_login')==='1'){hideLogin();await initApp();}
+      else{showLogin();}
+    }
+  }else{
+    hideLogin();
+    await initApp();
+  }
+}
+bootstrap();
+</script>
+</body>
+</html>

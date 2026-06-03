@@ -1,0 +1,7 @@
+# netlify.toml — วางไว้ที่โฟลเดอร์หลักของเว็บ
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[functions]
+  node_bundler = "esbuild"
